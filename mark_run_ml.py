@@ -726,7 +726,7 @@ train_test_report(Clf2,'All')
 time_mark("GridSearchCV:M1,M2,M3,M4,M5,M6,M7,M8")
 from sklearn.model_selection import GridSearchCV # import grid search cv to tune parameters
 #clf_chosen=LR(random_state=337) # intialize the LR model
-clf_chosen=LR(random_state=337, max_iter=10000) # intialize the LR model
+clf_chosen=LR(random_state=337, max_iter=2000) # intialize the LR model
 
 # scaled dataset type I activity weights
 weights_dic_1= {1:0.179248,2:0.15867,3:0.144265,4:0.161919,5:0.17849,6:0.177407}

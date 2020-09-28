@@ -165,10 +165,12 @@ from IPython.display import display
 # import pyplot for plotting
 import matplotlib.pyplot as plt
 
+
+##ethan##
 is_plt_out = False
 
 def show_nothing(*args, **kwargs):
-    pass
+    plt.close()
 
 if not is_plt_out:
     plt.show = show_nothing
@@ -179,16 +181,84 @@ def time_mark(mark):
     global last_mark, last_mark_time
     now = timer()
     if last_mark_time is None:
-        console_str = "{} occured at {:.2f} sec".format(mark, now-start_time)
+        console_str = "{} occured at {:.2f} sec / {:.2f} min".format(mark, now-start_time, (now-start_time)/60)
     else:
-        console_str = "{} occured at {:.2f} sec -- {:.2f} sec after last mark: {}".format(mark, now-start_time, now-last_mark_time, last_mark)
+        console_str = "{} occured at {:.2f} sec / {:.2f} min -- {:.2f} sec after last mark: {}".format(mark, now-start_time, (now-start_time)/60, now-last_mark_time, last_mark)
     print("\033[0;32m" + console_str + "\033[0;0m")
     last_mark = mark
     last_mark_time = now
 
+
+import sys
+class ProgressBar:
+    """This progress bar was taken from PYMC
+    """
+    def __init__(self, iterations, mark=None):
+        self.iterations = iterations
+        self.prog_bar = '[]'
+        self.fill_char = '*'
+        self.width = 40
+
+        self.mark = mark
+        if self.mark is not None:
+            self.prog_bar = self.mark + ' []'
+        self.cnt = 0
+        self.done = False
+        self.begin = timer()
+        
+        self.__update_amount(0)
+
+
+    def inc(self, amt=1):
+        if self.done:
+            return        
+        self.cnt += amt       
+        sys.stdout.write(str(self.prog_bar) + "\r")
+        sys.stdout.flush()
+        self.update_iteration(self.cnt)
+
+    def animate(self, iter):
+        if self.done:
+            return        
+        sys.stdout.write(str(self.prog_bar) + "\r")
+        sys.stdout.flush()
+        self.update_iteration(iter + 1)
+
+    def update_iteration(self, elapsed_iter):
+        self.__update_amount((elapsed_iter / float(self.iterations)) * 100.0)
+        self.prog_bar += '  %d of %s complete' % (elapsed_iter, self.iterations)
+
+    def __update_amount(self, new_amount):
+        if self.done:
+            return
+
+        percent_done = int(round((new_amount / 100.0) * 100.0))
+        all_full = self.width - 2
+        num_hashes = int(round((percent_done / 100.0) * all_full))
+        self.prog_bar = '[' + self.fill_char * num_hashes + ' ' * (all_full - num_hashes) + ']'
+        if self.mark is not None:
+            self.prog_bar = self.mark + " " + self.prog_bar
+        pct_place = (len(self.prog_bar) // 2) - len(str(percent_done))
+        pct_string = '%d%%' % percent_done
+        self.prog_bar = self.prog_bar[0:pct_place] + \
+            (pct_string + self.prog_bar[pct_place + len(pct_string):])
+        if percent_done >= 100:
+            print("\n")
+            now = timer()
+            if self.mark is not None:
+                print("{} took {:.2f} sec / {:.2f} min".format(self.mark, now - self.begin, (now - self.begin)/60))
+            else:
+                print("took {:.2f} sec / {:.2f} min".format(now - self.begin,(now - self.begin)/60))
+            self.done = True
+
+    def __str__(self):
+        return str(self.prog_bar)
+
+##ethan##
+
 plt.style.use('bmh') # for better plots
 
-time_mark("start")
+time_mark("X_Start")
 
 # %% [markdown]
 # <a id='step1'></a>
@@ -1218,8 +1288,9 @@ def mag_3_signals(x,y,z):# magnitude function redefintion
 time_sig_dic={} # An empty dictionary will contains dataframes of all time domain signals
 raw_dic_keys=sorted(raw_dic.keys()) # sorting dataframes' keys
 
+pgb = ProgressBar(len(raw_dic_keys), "time_sig_dic")
 for key in raw_dic_keys: # iterate over each key in raw_dic
-    
+    pgb.inc()
     raw_df=raw_dic[key] # copie the raw dataframe associated to 'expXX_userYY' from raw_dic
     
     time_sig_df=pd.DataFrame() # a dataframe will contain time domain signals
@@ -1371,7 +1442,9 @@ def Windowing_type_1(time_sig_dic,Labels_Data_Frame):
     
     BA_array=np.array(Labels_Data_Frame[(Labels_Data_Frame["activity_number_ID"] <7)]) # Just Basic activities
     
+    pgb = ProgressBar(len(BA_array), "Windowing_type_1")
     for line in BA_array:
+        pgb.inc()
         # Each line in BA_array contains info realted to an activity
 
         # extracting the dataframe key that contains rows related to this activity [expID,userID]
@@ -1499,7 +1572,9 @@ def Windowing_type_2(time_sig_dic,Labels_Data_Frame):
     window_ID=0
     t_dic_win_type_II={}
 
+    pgb = ProgressBar(len(time_sig_dic.keys()), "Windowing_type_2")
     for key in sorted(time_sig_dic.keys()):
+        pgb.inc()
 
         exp_array=np.array(time_sig_dic[key]) # converting the data frame in a an array
         lenght_exp=len(exp_array) # number of rows in this array
@@ -1611,7 +1686,7 @@ def fast_fourier_transform(t_window):
 # %%
 # generating 1 frequency domain window for verfication
 t_dic_win_type_II['t_W00000_exp01_user01_act05'].pipe(fast_fourier_transform).head(3)
-
+# time_mark("t_dic_win_type_II(t_W00000_exp01_user01_act05)")
 # %% [markdown]
 # ##### Discussion
 # %% [markdown]
@@ -1620,9 +1695,23 @@ t_dic_win_type_II['t_W00000_exp01_user01_act05'].pipe(fast_fourier_transform).he
 
 # %%
 # dictionaries includes f_windows obtained from t_windows type I and type II
-f_dic_win_type_I = {'f'+key[1:] : t_w1_df.pipe(fast_fourier_transform) for key, t_w1_df in t_dic_win_type_I.items()}
-f_dic_win_type_II = {'f'+key[1:] : t_w2_df.pipe(fast_fourier_transform) for key, t_w2_df in t_dic_win_type_II.items()}
+time_mark("f_dic_win_type_I_start")
+# f_dic_win_type_I = {'f'+key[1:] : t_w1_df.pipe(fast_fourier_transform) for key, t_w1_df in t_dic_win_type_I.items()}
+f_dic_win_type_I = {}
+pgb = ProgressBar(len(t_dic_win_type_I), "f_dic_win_type_I")
+for key, t_w1_df in t_dic_win_type_I.items():
+    pgb.inc()
+    f_dic_win_type_I['f'+key[1:]] = t_w1_df.pipe(fast_fourier_transform)
 
+time_mark("f_dic_win_type_I_end")
+time_mark("f_dic_win_type_II_start")
+#f_dic_win_type_II = {'f'+key[1:] : t_w2_df.pipe(fast_fourier_transform) for key, t_w2_df in t_dic_win_type_II.items()}
+f_dic_win_type_II = {}
+pgb = ProgressBar(len(t_dic_win_type_II), "f_dic_win_type_I")
+for key, t_w2_df in t_dic_win_type_II.items():
+    pgb.inc()
+    f_dic_win_type_II['f'+key[1:]] = t_w2_df.pipe(fast_fourier_transform)
+time_mark("f_dic_win_type_II_end")
 
 # %%
 # displaying the first f_window type I
@@ -2151,9 +2240,10 @@ def f_energy_axial(df):
 ####### Max Inds and Mean_Freq Functions#######################################
 # built frequencies list (each column contain 128 value)
 # duration between each two successive captures is 0.02 s= 1/50hz
+time_mark("fftfreq_start")
 freqs=sp.fftpack.fftfreq(128, d=0.02) 
-time_mark("fftfreq")
-                                
+time_mark("fftfreq_end")
+  
 
 # max_Inds
 def f_max_Inds_axial(df):
@@ -2605,7 +2695,9 @@ def Dataset_Generation_PipeLine(t_dic,f_dic):
     
     final_Dataset=pd.DataFrame(data=[],columns= all_columns) # build an empty dataframe to append rows
     
+    pgb = ProgressBar(len(t_dic), "Dataset_Generation_PipeLine")
     for i in range(len(t_dic)): # iterate throw each window
+        pgb.inc()
 
         # t_window and f_window should have the same window id included in their keys
         t_key=sorted(t_dic.keys() )[i] # extract the key of t_window
@@ -2726,6 +2818,7 @@ Dataset_type_II_part2.to_csv(path_or_buf=path4, na_rep='NaN',
 # %%
 end_time=timer()
 print ('Full Duration in seconds :', end_time-start_time)
+time_mark("X_End")
 
 # %% [markdown]
 # * **The dataset exported to newData folder will be used as inputs of the machine learning part**

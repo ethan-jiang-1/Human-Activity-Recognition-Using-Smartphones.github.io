@@ -149,6 +149,8 @@ start_time=timer()
 # %%
 # Importing numpy 
 import numpy as np
+##ethan##
+numpy = np
 
 # Importing Scipy 
 import scipy as sp
@@ -842,9 +844,10 @@ for activity_Id in range(1,13):# iterating throw activity ids from 1 to 12
 
 # %%
 # visualize Basic activities from 1 to 6
-for act in range(1,7): # Iterating throw each activity Id from 1 to 6
-    visualize_triaxial_signals(sample47_23,47,act,'acc',14,2) # visualize acc signals related to this activity
-    visualize_triaxial_signals(sample47_23,47,act,'gyro',14,2) # visualize gyro signals reated to this activity
+##ethan##
+#for act in range(1,7): # Iterating throw each activity Id from 1 to 6
+#    visualize_triaxial_signals(sample47_23,47,act,'acc',14,2) # visualize acc signals related to this activity
+#    visualize_triaxial_signals(sample47_23,47,act,'gyro',14,2) # visualize gyro signals reated to this activity
 
 # %% [markdown]
 # <a id='step240'></a>
@@ -855,9 +858,10 @@ for act in range(1,7): # Iterating throw each activity Id from 1 to 6
 
 # %%
 # visualize postural transitions (act_id from 7 to 12)
-for activity_Id in range(7,13): # iterating throw each activity Ids from 7 to 12
-    visualize_triaxial_signals(sample47_23,47,activity_Id,'acc',14,2) # visualize acc signals related to this activity
-    visualize_triaxial_signals(sample47_23,47,activity_Id,'gyro',14,2) # visualize gyro signals related to this activity
+##ethan##
+#for activity_Id in range(7,13): # iterating throw each activity Ids from 7 to 12
+#    visualize_triaxial_signals(sample47_23,47,activity_Id,'acc',14,2) # visualize acc signals related to this activity
+#    visualize_triaxial_signals(sample47_23,47,activity_Id,'gyro',14,2) # visualize gyro signals related to this activity
 
 # %% [markdown]
 # <a id='step242'></a>
@@ -1103,7 +1107,9 @@ def components_selection_one_signal(t_signal,freq1,freq2):
 # %%
 import math
 def mag_3_signals(x,y,z): # Euclidian magnitude
-    return [math.sqrt((x[i]**2+y[i]**2+z[i]**2)) for i in range(len(x))]
+##ethan##
+    #return [math.sqrt((x[i]**2+y[i]**2+z[i]**2)) for i in range(len(x))]
+    return [0 for i in range(len(x))]
 
 
 # %%
@@ -1172,7 +1178,9 @@ def jerk_one_signal(signal):
 ################################ Magnitude Function ######################################
 import math 
 def mag_3_signals(x,y,z):# magnitude function redefintion
-    return np.array([math.sqrt((x[i]**2+y[i]**2+z[i]**2)) for i in range(len(x))])
+    ##ethan## TODO: extreme slow process here
+    #return np.array([math.sqrt((x[i]**2+y[i]**2+z[i]**2)) for i in range(len(x))])
+    return np.array([0 for i in range(len(x))])
 
 # %% [markdown]
 # <a id='step326'></a>
@@ -1189,7 +1197,8 @@ time_sig_dic={} # An empty dictionary will contains dataframes of all time domai
 raw_dic_keys=sorted(raw_dic.keys()) # sorting dataframes' keys
 
 for key in raw_dic_keys: # iterate over each key in raw_dic
-    
+    ##ethan## TODO: extreme slow process here
+    print("slow process all time domain signals {}".format(key))
     raw_df=raw_dic[key] # copie the raw dataframe associated to 'expXX_userYY' from raw_dic
     
     time_sig_df=pd.DataFrame() # a dataframe will contain time domain signals
@@ -1898,7 +1907,9 @@ def t_axial_features_generation(t_window):
         energy_vector = t_energy_axial(df)# 3 values
         IQR_vector    = IQR_axial(df)# 3 values
         entropy_vector= entropy_axial(df)# 3 values
-        AR_vector     = t_arburg_axial(df)# 3 values
+        ##ethan## crash 
+        ### AR_vector     = t_arburg_axial(df)# 3 values
+        AR_vector     = entropy_vector
         corr_vector   = t_corr_axial(df)# 3 values
         
         # 40 value per each 3-axial signals
@@ -1972,8 +1983,12 @@ def t_mag_features_generation(t_window):
         sma_value    = t_sma_mag(mag_columns[col])# 1 value
         energy_value = t_energy_mag(mag_columns[col])# 1 value
         IQR_value    = IQR_mag(mag_columns[col])# 1 value
-        entropy_value= entropy_mag(mag_columns[col])# 1 value
-        AR_vector    = t_arburg_mag(mag_columns[col])# 1 value
+        ##ethan## nan
+        ### entropy_value= entropy_mag(mag_columns[col])# 1 value
+        entropy_value = float(0)
+        ##ethan## crash
+        ###AR_vector    = t_arburg_mag(mag_columns[col])# 1 value
+        AR_vector    = [float(0)]
         
         # 13 value per each t_mag_column
         col_mag_values = [mean_value, std_value, mad_value, max_value, min_value, sma_value, 
@@ -2583,10 +2598,14 @@ def Dataset_Generation_PipeLine(t_dic,f_dic):
         window_activity_id=int(t_key[-2:]) # extract the activity id from the windows key
 
         # generate all time features from t_window 
+        ##ethan##
         time_features = t_axial_features_generation(t_window) + t_mag_features_generation(t_window)
+        #time_features = t_axial_features_generation(t_window)
         
         # generate all frequency features from f_window
+        ##ethan##
         frequency_features = f_axial_features_generation(f_window) + f_mag_features_generation(f_window)
+        #frequency_features = f_axial_features_generation(f_window)
         
         # Generate addtional features from t_window
         additional_features= angle_features(t_window)
@@ -2596,6 +2615,10 @@ def Dataset_Generation_PipeLine(t_dic,f_dic):
         # go to the first free index in the dataframe
         free_index=len(final_Dataset)
         
+        ##ethan##
+        all_col_num = len(all_columns)
+        if len(row) != all_col_num:
+            import pdb; pdb.set_trace()
         # append the row
         final_Dataset.loc[free_index]= row
         

@@ -1,5 +1,6 @@
 .vscode
 .ipynb_checkpoints
+__pycache__
 
 "New Data\\full_Datasets_type_I_and_II\\Dataset_II_part1.csv"
 "New Data\\full_Datasets_type_I_and_II\\Dataset_II_part2.csv"

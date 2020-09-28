@@ -209,12 +209,13 @@ def extract_drop_outliers(Df,threshold,typ):
     columns=Df.columns # column names of the dataset
     
     outliers={} # dictionary will contain number of outliers per row . keys are rows' indexes
+    pgb = ProgressBar((max_range+1)*len(columns[:-2]), "extract_drop_outliers")
     for i in range(1,max_range+1):# iterate throw each activity type in the dataset
         
         Df_A=Df[Df['activity_Id']==i] # select rows related to this activity
         
         for column in columns[:-2]:# iterate throw features columns only in Df_A
-            
+            pgb.inc()
             q1= Df_A[column].describe()['25%'] # the value of the first quartile of a column in Df_A
             
             q3= Df_A[column].describe()['75%'] # the value of the third quartile of a column in Df_A
@@ -499,7 +500,8 @@ from sklearn.metrics import confusion_matrix as cm # import confusion matrix
 # intialize models
 Benchmark_model =NB()
 Clf1=DTC(random_state=337)
-Clf2=LR(random_state=337)
+#Clf2=LR(random_state=337)
+Clf2=LR(random_state=337, max_iter=10000)
 
 
 # %%
@@ -723,7 +725,8 @@ train_test_report(Clf2,'All')
 # %%
 time_mark("GridSearchCV:M1,M2,M3,M4,M5,M6,M7,M8")
 from sklearn.model_selection import GridSearchCV # import grid search cv to tune parameters
-clf_chosen=LR(random_state=337) # intialize the LR model
+#clf_chosen=LR(random_state=337) # intialize the LR model
+clf_chosen=LR(random_state=337, max_iter=10000) # intialize the LR model
 
 # scaled dataset type I activity weights
 weights_dic_1= {1:0.179248,2:0.15867,3:0.144265,4:0.161919,5:0.17849,6:0.177407}
@@ -910,8 +913,10 @@ def lookup_best_c(x_train,y_train,x_test,y_test):
     
     for value in C_values:# iterate throw each C value
         #tuned model 1 best parameters + C variable
+        #tmp_model=LR(solver='lbfgs',class_weight= None,multi_class= 'ovr', 
+        #          dual=False, penalty= 'l2',random_state=337,C=value)
         tmp_model=LR(solver='lbfgs',class_weight= None,multi_class= 'ovr', 
-                  dual=False, penalty= 'l2',random_state=337,C=value)
+                  dual=False, penalty= 'l2',random_state=337,C=value, max_iter=10000)
         # train the model
         tmp_model.fit(x_train,y_train)
         
@@ -946,8 +951,10 @@ def lookup_best_c(x_train,y_train,x_test,y_test):
     for value in C_values:
         
         #tuned model 5 best parameters + C variable
+        #tmp_model=LR(solver='liblinear', class_weight= None, multi_class= 'ovr',
+        #          dual= True, penalty= 'l2',random_state=337,C=value)
         tmp_model=LR(solver='liblinear', class_weight= None, multi_class= 'ovr',
-                  dual= True, penalty= 'l2',random_state=337,C=value)
+                  dual= True, penalty= 'l2',random_state=337,C=value, max_iter=10000)
         tmp_model.fit(x_train,y_train)
         tmp_predictions=tmp_model.predict(x_test)
         tmp_accuracy=accuracy(tmp_predictions,y_test)
@@ -1056,13 +1063,13 @@ print('Running Duration= ',fin-Debut)
 # best C values was selected from each search 
 time_mark("LogisticRegression")
 final_model_I=LR(solver='lbfgs',class_weight= None,multi_class= 'ovr', 
-                  dual=False, penalty= 'l2',random_state=337,C=4.7)
+                  dual=False, penalty= 'l2',random_state=337,C=4.7, max_iter=10000)
 final_model_II=LR(solver='liblinear', class_weight= None, multi_class= 'ovr',
-                  dual= True, penalty= 'l2',random_state=337,C=0.8)
+                  dual= True, penalty= 'l2',random_state=337,C=0.8, max_iter=10000)
 
 # for dataset type III model 7 best parameters + best C value have the highest accuracy compared to model 8 best C value 
 final_model_III=LR(solver= 'newton-cg', class_weight= None, multi_class= 'ovr', 
-                  dual= False, penalty= 'l2',random_state=337,C=8.7)
+                  dual= False, penalty= 'l2',random_state=337,C=8.7, max_iter=10000)
 
 
 # %%

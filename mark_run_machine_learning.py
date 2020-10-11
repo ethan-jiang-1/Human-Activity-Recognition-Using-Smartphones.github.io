@@ -17,6 +17,9 @@ from IPython.display import display
 from matplotlib import pyplot as plt # import matplot. pyplot to allow figure's plotting
 #plt.style.use('bmh') # for better plots
 
+##ethan##
+from s_support import ProgressBar, turn_off_plt, time_mark
+turn_off_plt()
 
 # %%
 # scrapping data files path
@@ -180,11 +183,13 @@ def data_exploration_pipeline(Dataset,typ,outliers):
 
 # %%
 # apply the data_exploration_pipeline to dataset type 1
+time_mark("data_exploration_pipeline:Dataset_type_I")
 data_exploration_pipeline(Dataset_type_I,1,False)
 
 
 # %%
 # apply the data exploration pipe line to dataset type II
+time_mark("data_exploration_pipeline:Dataset_type_II")
 data_exploration_pipeline(Dataset_type_II,2,False)
 
 # %% [markdown]
@@ -204,12 +209,13 @@ def extract_drop_outliers(Df,threshold,typ):
     columns=Df.columns # column names of the dataset
     
     outliers={} # dictionary will contain number of outliers per row . keys are rows' indexes
+    pgb = ProgressBar((max_range+1)*len(columns[:-2]), "extract_drop_outliers")
     for i in range(1,max_range+1):# iterate throw each activity type in the dataset
         
         Df_A=Df[Df['activity_Id']==i] # select rows related to this activity
         
         for column in columns[:-2]:# iterate throw features columns only in Df_A
-            
+            pgb.inc()
             q1= Df_A[column].describe()['25%'] # the value of the first quartile of a column in Df_A
             
             q3= Df_A[column].describe()['75%'] # the value of the third quartile of a column in Df_A
@@ -273,11 +279,13 @@ def extract_drop_outliers(Df,threshold,typ):
 
 # %%
 # apply extract drop outliers to dataset type I
+time_mark("extract_drop_outliers:Dataset_type_I")
 clean_Dataset_type_I= extract_drop_outliers(Dataset_type_I,100,1)# store the clean dataframe
 
 
 # %%
 # apply drop extract outliers to dataset type
+time_mark("extract_drop_outliers:Dataset_type_II")
 clean_Dataset_type_II= extract_drop_outliers(Dataset_type_II,100,2)# store the clean dataframe
 
 # %% [markdown]
@@ -320,6 +328,7 @@ def scaling_DF(data_frame):
 scaled_type_I=scaling_DF(clean_Dataset_type_I)
 
 # explore the scaled dataset type I
+time_mark("data_exploration_pipeline:scaled_type_I")
 data_exploration_pipeline(scaled_type_I,1,False)
 
 
@@ -328,6 +337,7 @@ data_exploration_pipeline(scaled_type_I,1,False)
 scaled_type_II=scaling_DF(clean_Dataset_type_II)
 
 # explore the scaled dataset type II
+time_mark("data_exploration_pipeline:scaled_type_II")
 data_exploration_pipeline(scaled_type_II,2,False)
 
 # %% [markdown]
@@ -352,6 +362,7 @@ scaled_type_III['activity_Id']=np.array(act_labels)
 
 # %%
 # apply the data exploration pipeline to scaled dataset type III
+time_mark("data_exploration_pipeline:scaled_type_III")
 data_exploration_pipeline(scaled_type_III,3,False)
 
 # %% [markdown]
@@ -422,11 +433,11 @@ def create_training_testing_data(scaled_Df,train_users,test_users,typ):
     
     # adapting the dataset name switch the case
     if typ==1:
-           Dataset_name="Dataset type I"
+        Dataset_name="Dataset type I"
     if typ==2:
-           Dataset_name="Dataset type II"
+        Dataset_name="Dataset type II"
     if typ==3:
-           Dataset_name="Dataset type III"
+        Dataset_name="Dataset type III"
     
     print("")
     print("______________________________"+Dataset_name+" Train features & labels info:______________________________________")
@@ -478,6 +489,7 @@ train_test_files_dic[3]=[X_3_train, X_3_test, y_3_train, y_3_test]
 # # VI. Train-Test PipeLine
 
 # %%
+time_mark("GaussianNB:DecisionTreeClassifier:LogisticRegression:M0,M1:M2")
 from sklearn.naive_bayes import GaussianNB as NB # import gaussian naive bayes classifier
 from sklearn.tree import DecisionTreeClassifier as DTC # import decision tree classifier
 from sklearn.linear_model import LogisticRegression as LR # import logistic regression classifier
@@ -488,7 +500,8 @@ from sklearn.metrics import confusion_matrix as cm # import confusion matrix
 # intialize models
 Benchmark_model =NB()
 Clf1=DTC(random_state=337)
-Clf2=LR(random_state=337)
+#Clf2=LR(random_state=337)
+Clf2=LR(random_state=337, max_iter=10000)
 
 
 # %%
@@ -685,6 +698,7 @@ def train_test_report(classifier,dataset_type):
 
 # %%
 # training, testing and evaluating the benchmark model on all datasets
+time_mark("M0:GaussianNB")
 train_test_report(Benchmark_model,'All')
 
 # %% [markdown]
@@ -694,6 +708,7 @@ train_test_report(Benchmark_model,'All')
 
 # %%
 # training, testing and evaluating Decision tree classifier on all datasets
+time_mark("M1:DecisionTreeClassifier")
 train_test_report(Clf1,'All')
 
 # %% [markdown]
@@ -701,14 +716,17 @@ train_test_report(Clf1,'All')
 
 # %%
 # training, testing and evaluating Logistic Regression  classifier on all datasets
+time_mark("M2:LogisticRegression")
 train_test_report(Clf2,'All')
 
 # %% [markdown]
 # # IX. Tunning Parameters
 
 # %%
+time_mark("GridSearchCV:M1,M2,M3,M4,M5,M6,M7,M8")
 from sklearn.model_selection import GridSearchCV # import grid search cv to tune parameters
-clf_chosen=LR(random_state=337) # intialize the LR model
+#clf_chosen=LR(random_state=337) # intialize the LR model
+clf_chosen=LR(random_state=337, max_iter=2000) # intialize the LR model
 
 # scaled dataset type I activity weights
 weights_dic_1= {1:0.179248,2:0.15867,3:0.144265,4:0.161919,5:0.17849,6:0.177407}
@@ -759,8 +777,11 @@ tuned_model3 =GridSearchCV(estimator =clf_chosen,
                           param_grid=params_3)
 
 # train models
+time_mark("M1:GridSearchCV")
 tuned_model1.fit(X_1_train,y_1_train)
+time_mark("M2:GridSearchCV")
 tuned_model2.fit(X_1_train,y_1_train)
+time_mark("M3:GridSearchCV")
 tuned_model3.fit(X_1_train,y_1_train)
 
 # display best parameters of each model
@@ -788,8 +809,11 @@ tuned_model5 =GridSearchCV(estimator =clf_chosen,
 tuned_model6 =GridSearchCV(estimator =clf_chosen,
                           param_grid=params_6)
 
+time_mark("M4:GridSearchCV")
 tuned_model4.fit(X_2_train,y_2_train)
+time_mark("M5:GridSearchCV")
 tuned_model5.fit(X_2_train,y_2_train)
+time_mark("M6:GridSearchCV")
 tuned_model6.fit(X_2_train,y_2_train)
 
 print("Tuned model 4 best params:",tuned_model4.best_params_)
@@ -815,8 +839,11 @@ tuned_model8 =GridSearchCV(estimator =clf_chosen,
 tuned_model9 =GridSearchCV(estimator =clf_chosen,
                           param_grid=params_9)
 
+time_mark("M7:GridSearchCV")
 tuned_model7.fit(X_3_train,y_3_train)
+time_mark("M8:GridSearchCV")
 tuned_model8.fit(X_3_train,y_3_train)
+time_mark("M9:GridSearchCV")
 tuned_model9.fit(X_3_train,y_3_train)
 
 print("Tuned model 7 best params:",tuned_model7.best_params_)
@@ -886,8 +913,10 @@ def lookup_best_c(x_train,y_train,x_test,y_test):
     
     for value in C_values:# iterate throw each C value
         #tuned model 1 best parameters + C variable
+        #tmp_model=LR(solver='lbfgs',class_weight= None,multi_class= 'ovr', 
+        #          dual=False, penalty= 'l2',random_state=337,C=value)
         tmp_model=LR(solver='lbfgs',class_weight= None,multi_class= 'ovr', 
-                  dual=False, penalty= 'l2',random_state=337,C=value)
+                  dual=False, penalty= 'l2',random_state=337,C=value, max_iter=10000)
         # train the model
         tmp_model.fit(x_train,y_train)
         
@@ -922,8 +951,10 @@ def lookup_best_c(x_train,y_train,x_test,y_test):
     for value in C_values:
         
         #tuned model 5 best parameters + C variable
+        #tmp_model=LR(solver='liblinear', class_weight= None, multi_class= 'ovr',
+        #          dual= True, penalty= 'l2',random_state=337,C=value)
         tmp_model=LR(solver='liblinear', class_weight= None, multi_class= 'ovr',
-                  dual= True, penalty= 'l2',random_state=337,C=value)
+                  dual= True, penalty= 'l2',random_state=337,C=value, max_iter=10000)
         tmp_model.fit(x_train,y_train)
         tmp_predictions=tmp_model.predict(x_test)
         tmp_accuracy=accuracy(tmp_predictions,y_test)
@@ -1030,28 +1061,32 @@ print('Running Duration= ',fin-Debut)
 
 # %%
 # best C values was selected from each search 
+time_mark("LogisticRegression")
 final_model_I=LR(solver='lbfgs',class_weight= None,multi_class= 'ovr', 
-                  dual=False, penalty= 'l2',random_state=337,C=4.7)
+                  dual=False, penalty= 'l2',random_state=337,C=4.7, max_iter=10000)
 final_model_II=LR(solver='liblinear', class_weight= None, multi_class= 'ovr',
-                  dual= True, penalty= 'l2',random_state=337,C=0.8)
+                  dual= True, penalty= 'l2',random_state=337,C=0.8, max_iter=10000)
 
 # for dataset type III model 7 best parameters + best C value have the highest accuracy compared to model 8 best C value 
 final_model_III=LR(solver= 'newton-cg', class_weight= None, multi_class= 'ovr', 
-                  dual= False, penalty= 'l2',random_state=337,C=8.7)
+                  dual= False, penalty= 'l2',random_state=337,C=8.7, max_iter=10000)
 
 
 # %%
 # train, test and evaluate final model I on dataset type I
+time_mark("MI:LogisticRegression")
 train_test_report(final_model_I,1)
 
 
 # %%
 # train, test and evaluate final model II on dataset type II
+time_mark("MII:LogisticRegression")
 train_test_report(final_model_II,2)
 
 
 # %%
 # train, test and evaluate final model III on dataset type III
+time_mark("MIII:LogisticRegression")
 train_test_report(final_model_III,3)
 
 # %% [markdown]
@@ -1109,6 +1144,7 @@ def Samples_Results(x_test,y_test,model,samples_index,dataset_type):
 
 # %%
 # train the final model I on dataset type I
+time_mark("MI:LogisticRegression")
 final_model_I.fit(X_1_train,y_1_train)
 # display results
 Samples_Results(X_1_test,y_1_test,final_model_I,indexes_I,1) 
@@ -1116,6 +1152,7 @@ Samples_Results(X_1_test,y_1_test,final_model_I,indexes_I,1)
 
 # %%
 # train the final model II on dataset type II
+time_mark("MII:LogisticRegression")
 final_model_II.fit(X_2_train,y_2_train)
 # display results
 Samples_Results(X_2_test,y_2_test,final_model_II,indexes_II,2)
@@ -1123,10 +1160,10 @@ Samples_Results(X_2_test,y_2_test,final_model_II,indexes_II,2)
 
 # %%
 # train the final model III on dataset type III
+time_mark("MIII:LogisticRegression")
 final_model_III.fit(X_3_train,y_3_train)
 # display results
 Samples_Results(X_3_test,y_3_test,final_model_III,indexes_III,3)
 
 # %% [markdown]
 # # Fin
-

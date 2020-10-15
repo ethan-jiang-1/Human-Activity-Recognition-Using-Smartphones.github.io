@@ -1,5 +1,5 @@
 import numpy as np
-import scipy as sp
+#import scipy as sp
 
 # necessary functions
 # import fft(Fast Fourier Transform) function to convert a signal from time domain to
@@ -12,7 +12,7 @@ from scipy.fftpack import fftfreq
 # import ifft function (inverse fft) inverse the conversion
 from scipy.fftpack import ifft
 
-import math  # import math library
+#import math  # import math library
 ############################## Constants #############################
 # nyq is the nyquist frequency equal to the half of the sampling frequency[50/2= 25 Hz]
 sampling_freq = 50
@@ -49,7 +49,7 @@ def components_selection_one_signal(t_signal, freq1=freq1, freq2=freq2):
     # generate frequencies associated to f_signal complex values
     # frequency values between [-25hz:+25hz]
     d = 1 / float(sampling_freq)
-    freqs = np.array(sp.fftpack.fftfreq(t_signal_length, d=d))
+    freqs = np.array(fftfreq(t_signal_length, d=d))
 
     # DC_component: f_signal values having freq between [-0.3 hz to 0 hz] and from [0 hz to 0.3hz]
     #                                                             (-0.3 and 0.3 are included)

@@ -11,6 +11,7 @@ import pandas as pd
 # import glob function to scrap files path
 from glob import glob
 from IPython.display import display
+import os
 
 ##ethan##
 from s_support import ProgressBar, turn_off_plt, mark_time, mark_milestone, has_flag, prompt_exception, prompt_highlight
@@ -231,10 +232,10 @@ for i in range(1,NumFR+1):# iterating over exp ids
     # storing row numbers in a list
     useful_rows_per_df.append(useful_rows_number)
 
-
+window_ID = 0  # window unique id
 def Windowing_type_1(time_sig, exp_user_key, raw_prefix):
+    global window_ID
 
-    window_ID = 0  # window unique id
     win_time_sig = {}  # output dic
 
     BA_array = np.array(Labels_Data_Frame[(
@@ -268,28 +269,41 @@ def Windowing_type_1(time_sig, exp_user_key, raw_prefix):
 
                 # incrementing the windowID by 1
                 window_ID = window_ID + 1
-            return win_time_sig
 
     return win_time_sig  # return a dictionary including time domain windows type I
 
 
-for eu in ((1,1), (2,1), (3,2), (4,2)):
-    exp_no = eu[0]
-    user_no = eu[1]    
-    exp_user_key = "exp{:02d}_user{:02d}".format(exp_no, user_no)
-    if exp_user_key in raw_dic:
-        raw_time_sigs = raw_dic[exp_user_key]
-        time_sig_x = raw_time_sigs["acc_X"]
-        time_sig_y = raw_time_sigs["acc_Y"]
-        time_sig_z = raw_time_sigs["acc_Z"]
-        prompt_highlight("win_time_sigs for", exp_user_key)
-        win_time_sig_x = Windowing_type_1(time_sig_x, exp_user_key, "aX")
-        display(win_time_sig_x.keys())
+def dumpNamedWindow(exp_user_key, win_time_sig):
+    keys = sorted(win_time_sig.keys())
+    sub_folder = "DataWin/" + exp_user_key
+    if not os.path.isdir(sub_folder):
+        os.mkdir(sub_folder)
+    for key in keys:
+        filename = "{}/{}.txt".format(sub_folder, key)
+        data = win_time_sig[key]
+        with open(filename, "w+") as f:
+            f.write(" ".join([str(elem) for elem in data]))
 
-        win_time_sig_y = Windowing_type_1(time_sig_y, exp_user_key, "aY")
-        display(win_time_sig_y.keys())
 
-        win_time_sig_z = Windowing_type_1(time_sig_z, exp_user_key, "aZ")
-        display(win_time_sig_z.keys())
+exp_no = 1
+user_no = 1   
+exp_user_key = "exp{:02d}_user{:02d}".format(exp_no, user_no)
+if exp_user_key in raw_dic:
+    raw_time_sigs = raw_dic[exp_user_key]
+    time_sig_x = raw_time_sigs["acc_X"]
+    time_sig_y = raw_time_sigs["acc_Y"]
+    time_sig_z = raw_time_sigs["acc_Z"]
+    prompt_highlight("win_time_sigs for", exp_user_key)
+    win_time_sig_x = Windowing_type_1(time_sig_x, exp_user_key, "aX")
+    # display(win_time_sig_x.keys())
+    dumpNamedWindow(exp_user_key, win_time_sig_x)
+
+    win_time_sig_y = Windowing_type_1(time_sig_y, exp_user_key, "aY")
+    # display(win_time_sig_y.keys())
+    dumpNamedWindow(exp_user_key, win_time_sig_y)
+
+    win_time_sig_z = Windowing_type_1(time_sig_z, exp_user_key, "aZ")
+    #display(win_time_sig_z.keys())
+    dumpNamedWindow(exp_user_key, win_time_sig_z)
 
 prompt_highlight("done")

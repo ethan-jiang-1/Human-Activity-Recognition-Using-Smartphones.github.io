@@ -1695,32 +1695,33 @@ prompt_highlight("f_dic_win_type_I out of t_dic_win_type_I",
 mark_time("f_dic_win_type_I_end")
 mark_milestone("f_dic_win_type_I")
 
-
-mark_time("f_dic_win_type_II_start")
-#f_dic_win_type_II = {'f'+key[1:] : t_w2_df.pipe(fast_fourier_transform) for key, t_w2_df in t_dic_win_type_II.items()}
-f_dic_win_type_II = {}
-pgb = ProgressBar(len(t_dic_win_type_II), "f_dic_win_type_II")
-for key, t_w2_df in t_dic_win_type_II.items():
-    pgb.inc()
-    f_dic_win_type_II['f'+key[1:]] = t_w2_df.pipe(fast_fourier_transform)
-fwex = "f_W00000_exp01_user01_act05"
-if fwex in f_dic_win_type_II:
-    item = f_dic_win_type_II[fwex]
-    print("item of ", twex, "in f_dic_win_type_II")
-    print("shape of each item ", item.shape)
-    print("keys for item", len(item.keys()), item.keys())
-    print(item.head(3))
-prompt_highlight("f_dic_win_type_II out of t_dic_win_type_II",
-                 len(f_dic_win_type_II.keys()), "typical key: ", list(f_dic_win_type_II.keys())[0:3])
-mark_time("f_dic_win_type_II_end")
-mark_milestone("f_dic_win_type_II")
+if not has_flag("FlSkWinII"):
+    mark_time("f_dic_win_type_II_start")
+    #f_dic_win_type_II = {'f'+key[1:] : t_w2_df.pipe(fast_fourier_transform) for key, t_w2_df in t_dic_win_type_II.items()}
+    f_dic_win_type_II = {}
+    pgb = ProgressBar(len(t_dic_win_type_II), "f_dic_win_type_II")
+    for key, t_w2_df in t_dic_win_type_II.items():
+        pgb.inc()
+        f_dic_win_type_II['f'+key[1:]] = t_w2_df.pipe(fast_fourier_transform)
+    fwex = "f_W00000_exp01_user01_act05"
+    if fwex in f_dic_win_type_II:
+        item = f_dic_win_type_II[fwex]
+        print("item of ", twex, "in f_dic_win_type_II")
+        print("shape of each item ", item.shape)
+        print("keys for item", len(item.keys()), item.keys())
+        print(item.head(3))
+    prompt_highlight("f_dic_win_type_II out of t_dic_win_type_II",
+                    len(f_dic_win_type_II.keys()), "typical key: ", list(f_dic_win_type_II.keys())[0:3])
+    mark_time("f_dic_win_type_II_end")
+    mark_milestone("f_dic_win_type_II")
 
 
 # %%
 # displaying the first f_window type I
-f_window = f_dic_win_type_I[sorted(f_dic_win_type_I.keys())[0]]
-f_window.head()
-mark_time("f_window")
+# f_window = f_dic_win_type_I[sorted(f_dic_win_type_I.keys())[0]]
+# print(f_window.head())
+# mark_time("f_window")
+mark_milestone("t_dic_win and f_dic_win basic are all completed, need more extra feature attached")
 
 # %% [markdown]
 # <a id='step3355'></a>
@@ -2758,13 +2759,14 @@ display(Dataset_type_I.head(3)) # the first three rows
 # - **Step 3: Generating Dataset type II**
 
 # %%
-# apply datasets generation pipeline to time and frequency windows type II
-mark_time("Dataset_Generation_PipeLine_start_II")
-Dataset_type_II=Dataset_Generation_PipeLine(t_dic_win_type_II,f_dic_win_type_II)
-mark_time("Dataset_Generation_PipeLine_end_II")
-print('The shape of Dataset type II is :',Dataset_type_II.shape)
-display(Dataset_type_II.describe())
-display(Dataset_type_II.head(3))
+if not has_flag("FlSkWinII"):
+    # apply datasets generation pipeline to time and frequency windows type II
+    mark_time("Dataset_Generation_PipeLine_start_II")
+    Dataset_type_II=Dataset_Generation_PipeLine(t_dic_win_type_II,f_dic_win_type_II)
+    mark_time("Dataset_Generation_PipeLine_end_II")
+    print('The shape of Dataset type II is :',Dataset_type_II.shape)
+    display(Dataset_type_II.describe())
+    display(Dataset_type_II.head(3))
 
 
 # %%
@@ -2789,14 +2791,13 @@ print('Duration in seconds :', end_time-start_time)
 Dataset_type_I_part1=Dataset_type_I.iloc[0:5001]
 Dataset_type_I_part2=Dataset_type_I.iloc[5001:]
 
-Dataset_type_II_part1=Dataset_type_II.iloc[0:6001]
-Dataset_type_II_part2=Dataset_type_II.iloc[6001:]
+if not has_flag("FlSkWinII"):
+    Dataset_type_II_part1=Dataset_type_II.iloc[0:6001]
+    Dataset_type_II_part2=Dataset_type_II.iloc[6001:]
 
 # Define paths and files' names
 path1="New Data\\full_Datasets_type_I_and_II\\Dataset_I_part1.csv"
 path2="New Data\\full_Datasets_type_I_and_II\\Dataset_I_part2.csv"
-path3="New Data\\full_Datasets_type_I_and_II\\Dataset_II_part1.csv"   
-path4="New Data\\full_Datasets_type_I_and_II\\Dataset_II_part2.csv"   
 
 # Export all part into a CSV form in : "New Data\\full_Datasets_type_I_and_II\"
 Dataset_type_I_part1.to_csv(path_or_buf=path1, na_rep='NaN',  
@@ -2812,18 +2813,22 @@ Dataset_type_I_part2.to_csv(path_or_buf=path2, na_rep='NaN',
              line_terminator='\n', 
              )
 
-Dataset_type_II_part1.to_csv(path_or_buf=path3, na_rep='NaN',  
-             columns=None, header=True, 
-             index=False, mode='w', 
-             encoding='utf-8',  
-             line_terminator='\n', 
-             )
-Dataset_type_II_part2.to_csv(path_or_buf=path4, na_rep='NaN',  
-             columns=None, header=True, 
-             index=False, mode='w', 
-             encoding='utf-8',  
-             line_terminator='\n', 
-             )
+if not has_flag("FlSkWinII"):
+    path3="New Data\\full_Datasets_type_I_and_II\\Dataset_II_part1.csv"   
+    path4="New Data\\full_Datasets_type_I_and_II\\Dataset_II_part2.csv"   
+
+    Dataset_type_II_part1.to_csv(path_or_buf=path3, na_rep='NaN',  
+                columns=None, header=True, 
+                index=False, mode='w', 
+                encoding='utf-8',  
+                line_terminator='\n', 
+                )
+    Dataset_type_II_part2.to_csv(path_or_buf=path4, na_rep='NaN',  
+                columns=None, header=True, 
+                index=False, mode='w', 
+                encoding='utf-8',  
+                line_terminator='\n', 
+                )
 
 
 # %%

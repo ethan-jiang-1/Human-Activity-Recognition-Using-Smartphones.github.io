@@ -114,6 +114,7 @@ def turn_off_plt():
 flags = []
 flags.append("FlSkipRaw")
 flags.append("FlSkWinII")
+flags.append("FlFakeAR")
 def has_flag(flag):
     if flag in flags:
         return True

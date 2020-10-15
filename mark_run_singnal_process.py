@@ -1954,8 +1954,8 @@ def _arburg2(X, order):
 
         # Update the AR coeff.
         try:
-            #a.resize(len(a)+1)
-            numpy.resize(a, len(a)+1)
+            a.resize(len(a)+1)
+            # numpy.resize(a, len(a)+1)
             a = a + ref[m] * numpy.flipud(a).conjugate()
         except Exception as ex:
             prompt_exception("_arburg2", ex)
@@ -1969,21 +1969,25 @@ def _arburg2(X, order):
 
 # to generate arburg (order 4) coefficents for 3 columns [X,Y,Z]
 def t_arburg_axial(df):
-    # converting signals to 1D numpy arrays for efficiency
-    array_X=np.array(df[df.columns[0]])
-    array_Y=np.array(df[df.columns[1]])
-    array_Z=np.array(df[df.columns[2]])
-    
-    AR_X = list(_arburg2(array_X,4)[0][1:].real) # list contains real parts of all 4th coefficients generated from signal_X
-    AR_Y = list(_arburg2(array_Y,4)[0][1:].real) # list contains real parts of all 4th coefficients generated from signal_Y
-    AR_Z = list(_arburg2(array_Z,4)[0][1:].real) # list contains real parts of all 4th coefficients generated from signal_Z
-    
-    # selecting [AR1 AR2 AR3 AR4] real components for each axis concatenate them in one vector
-    AR_vector= AR_X + AR_Y+ AR_Z
-    
-    
-    # AR_vector contains 12 values 4values per each axis 
-    return AR_vector
+    if has_flag("FlFakeAR"):
+        AR_vector = [0,0,0,0] +[0,0,0,0] + [0,0,0,0]
+        return AR_vector
+    else:
+        # converting signals to 1D numpy arrays for efficiency
+        array_X=np.array(df[df.columns[0]])
+        array_Y=np.array(df[df.columns[1]])
+        array_Z=np.array(df[df.columns[2]])
+        
+        AR_X = list(_arburg2(array_X,4)[0][1:].real) # list contains real parts of all 4th coefficients generated from signal_X
+        AR_Y = list(_arburg2(array_Y,4)[0][1:].real) # list contains real parts of all 4th coefficients generated from signal_Y
+        AR_Z = list(_arburg2(array_Z,4)[0][1:].real) # list contains real parts of all 4th coefficients generated from signal_Z
+        
+        # selecting [AR1 AR2 AR3 AR4] real components for each axis concatenate them in one vector
+        AR_vector= AR_X + AR_Y+ AR_Z
+        
+        
+        # AR_vector contains 12 values 4values per each axis 
+        return AR_vector
 
 
 from scipy.stats import pearsonr
@@ -2071,12 +2075,14 @@ def t_energy_mag(mag_column):
 
 # arburg: auto regression coefficients using the burg method
 def t_arburg_mag(mag_column):
-    
-    array = np.array(mag_column)
-    
-    AR_vector= list(_arburg2(array,4)[0][1:].real) # AR1, AR2, AR3, AR4 of the mag column
-    #print(AR_vector)
-    return AR_vector
+    if has_flag("FlFakeAR"):
+        return [0,0,0,0]
+    else:
+        array = np.array(mag_column)
+        
+        AR_vector= list(_arburg2(array,4)[0][1:].real) # AR1, AR2, AR3, AR4 of the mag column
+        #print(AR_vector)
+        return AR_vector
 
 # %% [markdown]
 # <a id='step3436'></a>
@@ -2130,9 +2136,8 @@ def time_features_names():
     t_axis_signals=[['t_body_acc_X','t_body_acc_Y','t_body_acc_Z'],
                     ['t_grav_acc_X','t_grav_acc_Y','t_grav_acc_Z'],
                     ['t_body_acc_jerk_X','t_body_acc_jerk_Y','t_body_acc_jerk_Z'],    
-
                     ['t_body_gyro_X','t_body_gyro_Y','t_body_gyro_Z'],
-            ['t_body_gyro_Jerk_X','t_body_gyro_Jerk_Y','t_body_gyro_Jerk_Z'],]
+                    ['t_body_gyro_Jerk_X','t_body_gyro_Jerk_Y','t_body_gyro_Jerk_Z'],]
     
     # time domain magnitude signals' names
     magnitude_signals=['t_body_acc_Mag','t_grav_acc_Mag','t_body_acc_jerk_Mag','t_body_gyro_Mag','t_body_gyro_Jerk_Mag']
@@ -2694,8 +2699,9 @@ angle_columns=['angle0()','angle1()','angle2()','angle3()','angle4()','angle5()'
 
 # %%
 # conctenate all features names lists and we add two other columns activity ids and user ids will be related to each row
-all_columns=time_features_names()+frequency_features_names()+angle_columns+['activity_Id','user_Id']
-print("all_colums", len(all_columns), all_columns)
+extra_columns = ['activity_Id','user_Id']
+all_columns= time_features_names() + frequency_features_names() + angle_columns + extra_columns
+print("planned all_colums {}: ".format(len(all_columns)), len(time_features_names()), len(frequency_features_names()), len(angle_columns), len(extra_columns))
 
 def Dataset_Generation_PipeLine(t_dic,f_dic):
     # t_dic is a dic contains time domain windows
@@ -2726,9 +2732,15 @@ def Dataset_Generation_PipeLine(t_dic,f_dic):
         
         # Generate addtional features from t_window
         additional_features= angle_features(t_window)
+
+        extra_features = [int(window_activity_id),int(window_user_id)]
+
         # concatenate all features and append the activity id and the user id
-        row= time_features + frequency_features + additional_features + [int(window_activity_id),int(window_user_id)]
-        
+        row = time_features + frequency_features + additional_features + extra_features
+        if len(row) != len(all_columns):
+            prompt_exception("row not mached", "")
+            print("actuall all_colums {}: ".format(len(row)), len(time_features), len(frequency_features), len(additional_features), len(extra_features))
+
         try:
             # go to the first free index in the dataframe
             free_index=len(final_Dataset)
@@ -2796,17 +2808,17 @@ if not has_flag("FlSkWinII"):
     Dataset_type_II_part2=Dataset_type_II.iloc[6001:]
 
 # Define paths and files' names
-path1="New Data\\full_Datasets_type_I_and_II\\Dataset_I_part1.csv"
-path2="New Data\\full_Datasets_type_I_and_II\\Dataset_I_part2.csv"
+path1="DataExam\\full_Datasets_type_I_and_II\\Dataset_I_part1.csv"
+path2="DataExam\\full_Datasets_type_I_and_II\\Dataset_I_part2.csv"
 
 # Export all part into a CSV form in : "New Data\\full_Datasets_type_I_and_II\"
-Dataset_type_I_part1.to_csv(path_or_buf=path1, na_rep='NaN',  
+Dataset_type_I_part1.to_csv(path_or_buf=path1.replace('\\','/'), na_rep='NaN',  
              columns=None, header=True, 
              index=False, mode='w', 
              encoding='utf-8',  
              line_terminator='\n', 
              )
-Dataset_type_I_part2.to_csv(path_or_buf=path2, na_rep='NaN',  
+Dataset_type_I_part2.to_csv(path_or_buf=path2.replace('\\', '/'), na_rep='NaN',
              columns=None, header=True, 
              index=False, mode='w', 
              encoding='utf-8',  
@@ -2814,16 +2826,16 @@ Dataset_type_I_part2.to_csv(path_or_buf=path2, na_rep='NaN',
              )
 
 if not has_flag("FlSkWinII"):
-    path3="New Data\\full_Datasets_type_I_and_II\\Dataset_II_part1.csv"   
-    path4="New Data\\full_Datasets_type_I_and_II\\Dataset_II_part2.csv"   
+    path3="DataExam\\full_Datasets_type_I_and_II\\Dataset_II_part1.csv"   
+    path4="DataExam\\full_Datasets_type_I_and_II\\Dataset_II_part2.csv"   
 
-    Dataset_type_II_part1.to_csv(path_or_buf=path3, na_rep='NaN',  
+    Dataset_type_II_part1.to_csv(path_or_buf=path3.replace('\\','/'), na_rep='NaN',  
                 columns=None, header=True, 
                 index=False, mode='w', 
                 encoding='utf-8',  
                 line_terminator='\n', 
                 )
-    Dataset_type_II_part2.to_csv(path_or_buf=path4, na_rep='NaN',  
+    Dataset_type_II_part2.to_csv(path_or_buf=path4.replace('\\', '/'), na_rep='NaN',
                 columns=None, header=True, 
                 index=False, mode='w', 
                 encoding='utf-8',  

@@ -48,8 +48,8 @@ def components_selection_one_signal(t_signal, freq1=freq1, freq2=freq2):
 
     # generate frequencies associated to f_signal complex values
     # frequency values between [-25hz:+25hz]
-    freqs = np.array(sp.fftpack.fftfreq(
-        t_signal_length, d=1 / float(sampling_freq)))
+    d = 1 / float(sampling_freq)
+    freqs = np.array(sp.fftpack.fftfreq(t_signal_length, d=d))
 
     # DC_component: f_signal values having freq between [-0.3 hz to 0 hz] and from [0 hz to 0.3hz]
     #                                                             (-0.3 and 0.3 are included)
@@ -97,9 +97,14 @@ def components_selection_one_signal(t_signal, freq1=freq1, freq2=freq2):
 
     ################### Inverse the transformation of signals in freq domain ########################
     # applying the inverse fft(ifft) to signals in freq domain and put them in float format
-    t_DC_component = ifft(np.array(f_DC_signal)).real
-    t_body_component = ifft(np.array(f_body_signal)).real
-    t_noise = ifft(np.array(f_noise_signal)).real
+    _tdc = ifft(np.array(f_DC_signal))
+    t_DC_component = _tdc.real
+    
+    _tbd = ifft(np.array(f_body_signal))
+    t_body_component = _tbd.real
+    
+    _tns = ifft(np.array(f_noise_signal))
+    t_noise = _tns.real
 
     # extracting the total component(filtered from noise)
     total_component = t_signal - t_noise

@@ -142,9 +142,8 @@
 
 # %%
 # Import default_timer to compute durations
+from datetime import time
 from timeit import default_timer as timer
-start_time=timer()
-
 
 # %%
 # Importing numpy 
@@ -167,13 +166,13 @@ import matplotlib.pyplot as plt
 
 
 ##ethan##
-from s_support import ProgressBar, turn_off_plt, time_mark
+from s_support import ProgressBar, turn_off_plt, mark_time, mark_milestone, has_flag, prompt_exception, prompt_highlight
 turn_off_plt()
 
 
 plt.style.use('bmh') # for better plots
-
-time_mark("X_Start")
+start_time=timer()
+mark_time("X_Start")
 
 # %% [markdown]
 # <a id='step1'></a>
@@ -203,7 +202,7 @@ time_mark("X_Start")
 
 # %%
 ####################### Scraping RawData files paths########################
-Raw_data_paths = sorted(glob("Data/Original-Data/HAPT-Dataset/Raw-Data/*"))
+_Raw_data_paths = sorted(glob("Data/Original-Data/HAPT-Dataset/Raw-Data/*"))
 
 # %% [markdown]
 # * **Step 01:** Verifying the number of files in each category.
@@ -212,19 +211,29 @@ Raw_data_paths = sorted(glob("Data/Original-Data/HAPT-Dataset/Raw-Data/*"))
 ################# Just to verify if all paths were scraped #################
 
 # Selecting acc file paths only
-Raw_acc_paths=Raw_data_paths[0:61]
+Raw_acc_paths=_Raw_data_paths[0:61]
 
 # Selecting gyro file paths only
-Raw_gyro_paths=Raw_data_paths[61:122]
+Raw_gyro_paths=_Raw_data_paths[61:122]
+
+# Labels file
+Labels_path = _Raw_data_paths[-1]
+
+Raw_skip_ratio = 1
+if has_flag("FlSkipRaw"):
+    Raw_skip_ratio = 20
+    _Raw_data_paths = _Raw_data_paths[::Raw_skip_ratio]
+    Raw_acc_paths = Raw_acc_paths[::Raw_skip_ratio]
+    Raw_gyro_paths = Raw_gyro_paths[::Raw_skip_ratio]
 
 # printing info related to acc and gyro files
-print (("RawData folder contains in total {:d} file ").format(len(Raw_data_paths)))
+print (("RawData folder contains in total {:d} file ").format(len(_Raw_data_paths)))
 print (("The first {:d} are Acceleration files:").format(len(Raw_acc_paths)))
 print (("The second {:d} are Gyroscope files:").format(len(Raw_gyro_paths)))
 print ("The last file is a labels file")
 
 # printing 'labels.txt' path
-print ("labels file path is:",Raw_data_paths[122])
+print ("labels file path is:", Labels_path)
 
 # %% [markdown]
 # <a id='step12'></a>
@@ -297,32 +306,39 @@ raw_acc_columns=['acc_X','acc_Y','acc_Z']
 # creating list contains gyro files columns names
 raw_gyro_columns=['gyro_X','gyro_Y','gyro_Z']
 
+NumFR = len(Raw_acc_paths)
+pgb = ProgressBar(NumFR, "loading_raw_data")
 # loop for to convert  each "acc file" into data frame of floats and store it in a dictionnary.
-for path_index in range(0,61):
+for path_index in range(0,NumFR):
+        pgb.inc()
         
         # extracting the file name only and use it as key:[expXX_userXX] without "acc" or "gyro"
-        key= Raw_data_paths[path_index][-16:-4]
+        exp_user_key= Raw_acc_paths[path_index][-16:-4]
         
         # Applying the function defined above to one acc_file and store the output in a DataFrame
-        raw_acc_data_frame=import_raw_signals(Raw_data_paths[path_index],raw_acc_columns)
+        raw_acc_data_frame=import_raw_signals(Raw_acc_paths[path_index],raw_acc_columns)
         
         # By shifting the path_index by 61 we find the index of the gyro file related to same experiment_ID
         # Applying the function defined above to one gyro_file and store the output in a DataFrame
-        raw_gyro_data_frame=import_raw_signals(Raw_data_paths[path_index+61],raw_gyro_columns)
+        raw_gyro_data_frame=import_raw_signals(Raw_gyro_paths[path_index],raw_gyro_columns)
         
         # concatenate acc_df and gyro_df in one DataFrame
         raw_signals_data_frame=pd.concat([raw_acc_data_frame, raw_gyro_data_frame], axis=1)
         
         # Store this new DataFrame in a raw_dic , with the key extracted above
-        raw_dic[key]=raw_signals_data_frame
+        raw_dic[exp_user_key] = raw_signals_data_frame
 
 
 # %%
 # raw_dic is a dictionary contains 61 combined DF (acc_df and gyro_df)
-print('raw_dic contains %d DataFrame' % len(raw_dic))
+print('raw_dic contains {} DataFrame, each for per person'.format(len(raw_dic)))
+all_exp_user_key = raw_dic.keys()
+print("raw_dic can be accessed by exp_user_key, typical key are: ", list(all_exp_user_key)[0:3])
+mark_time("all_raw_data_loaded_in_raw_dic: {}".format(len(raw_dic)))
 
 # print the first 3 rows of dataframe exp01_user01
 display(raw_dic['exp01_user01'].head(3))
+mark_milestone("all_raw_data_loaded:raw_dic")
 
 # %% [markdown]
 # - [**Return to Import Data**](#step1)
@@ -384,12 +400,14 @@ def import_labels_file(path,columns):
 raw_labels_columns=['experiment_number_ID','user_number_ID','activity_number_ID','Label_start_point','Label_end_point']
 
 # The path of "labels.txt" is last element in the list called "Raw_data_paths"
-labels_path=Raw_data_paths[-1]
+# labels_path=Raw_data_paths[-1]
 
 # apply the function defined above to labels.txt 
 # store the output  in a dataframe 
-Labels_Data_Frame=import_labels_file(labels_path,raw_labels_columns)
-time_mark("import_labels_file")
+Labels_Data_Frame=import_labels_file(Labels_path,raw_labels_columns)
+print("Labels_Data_Frame", Labels_Data_Frame.shape)
+print(Labels_Data_Frame.head(3))
+mark_time("import_labels_file")
 
 # %% [markdown]
 # * Visualize the first 3 rows of **Labels_Data_Frame**
@@ -399,6 +417,7 @@ time_mark("import_labels_file")
 print ("The first 3 rows of  Labels_Data_Frame:" )
 display(Labels_Data_Frame.head(3))
 print(Labels_Data_Frame.shape)
+mark_milestone("import_labels_file:Labels_Data_Frame")
 
 # %% [markdown]
 # - [**Return to Import Data**](#step1)
@@ -416,7 +435,7 @@ Acitivity_labels=AL={
         4: 'SITTING', 5: 'STANDING', 6: 'LIYING', # 3 static activities
         
         7: 'STAND_TO_SIT',  8: 'SIT_TO_STAND',  9: 'SIT_TO_LIE', 10: 'LIE_TO_SIT', 
-    11: 'STAND_TO_LIE', 12: 'LIE_TO_STAND',# 6 postural Transitions
+        11: 'STAND_TO_LIE', 12: 'LIE_TO_STAND',# 6 postural Transitions
        } 
 
 # %% [markdown]
@@ -463,15 +482,15 @@ Acitivity_labels=AL={
 rows_per_df=[len(raw_dic[key]) for key in sorted(raw_dic.keys())]
 
 # a list contains exp ids
-exp_ids=[i for i in range(1,62)]
+exp_ids=[i for i in range(1,NumFR+1)]
 
 # useful row is row that was captured while the user was performing an activity
 # some rows in acc and gyro files are not associated to an activity id
 
-# list that will contain the number of useful rows per dataframe
+# list that will contain the number of useful rows per dataframeç
 useful_rows_per_df=[]
 
-for i in range(1,62):# iterating over exp ids
+for i in range(1,NumFR+1):# iterating over exp ids
     # selecting start-end rows of each activity of the experiment
     start_end_df= Labels_Data_Frame[Labels_Data_Frame['experiment_number_ID']==i][['Label_start_point','Label_end_point']]
     # sum of start_labels and sum of end_labels
@@ -494,7 +513,7 @@ plt.xlabel('experience identifiers') # Set X axis info
 plt.ylabel('number of rows') # Set Y axis info
 plt.title('number of rows per experience') # Set the title of the bar plot
 plt.show() # Show the figure
-time_mark("experience_identifiers")
+mark_time("experience_identifiers")
 
 # %% [markdown]
 # <a id='step223'></a>
@@ -604,7 +623,8 @@ plt.show() # showing the figure
 # %%
 # Two full samples:
 sample01_01 = raw_dic['exp01_user01'] # acc and gyro signals of exp 01 user 01
-sample47_23 = raw_dic['exp47_user23'] # acc and gyro signals of exp 47 user 23
+#sample47_23 = raw_dic['exp47_user23'] # acc and gyro signals of exp 47 user 23
+sample47_23 = raw_dic['exp01_user01'] # acc and gyro signals of exp 47 user 23
 
 # %% [markdown]
 #  <a id='step233'></a>
@@ -616,126 +636,127 @@ sampling_freq=50 # 50 Hz(hertz) is sampling frequency: the number of captured va
 
 
 def visualize_triaxial_signals(data_frame,exp_id,act,sig_type,width,height):
-    
-    #################################### INPUTS ####################################################################
-    # inputs: Data_frame: Data frame contains acc and gyro signals                                                 #
-    #         exp_id: integer from 1 to 61 (the experience identifier)                                             #         
-    #         width: integer the width of the figure                                                               #
-    #         height: integer the height of the figure                                                             #
-    #         sig_type: string  'acc' to visualize 3-axial acceleration signals or 'gyro' for 3-axial gyro signals #
-    #         act: possible values: string: 'all' (to visualize full signals) ,                                    #
-    #              or integer from 1 to 12 to specify the activity id to be visualized                             #
-    #                                                                                                              #
-    #              if act is from 1 to 6 it will skip the first 250 rows(first 5 seconds) from                     #
-    #              the starting point of the activity and will visualize the next 400 rows (next 8 seconds)        #
-    #              if act is between 7 and 12  the function will visualize all rows(full duration) of the activity.# 
-    #################################################################################################################
-    
-    
-    keys=sorted(raw_dic.keys()) # list contains 'expXX_userYY' sorted from 1 to 61
-    key=keys[exp_id-1] # the key associated to exp_id (experience)
-    exp_id=str(exp_id)
-    user_id=key[-2:] # the user id associated to this experience in string format
-    
-    if act=='all': # to visualize full signal
-        # selecting all rows in the dataframe to be visualized , the dataframe stored in raw_dic and has the same key
-        data_df=data_frame
-    else:# act is an integer from 1 to 12 (id of the activity to be visualized ) 
-        # Select rows in labels file having the same exp_Id and user_Id mentioned above + the activity id (act)
-        # selecting the first result in the search made in labels file
-        # and select the start point and end point of this row related to this activity Id (act) 
-        start_point,end_point=Labels_Data_Frame[
-                             (Labels_Data_Frame["experiment_number_ID"]==int(exp_id))&
-                             (Labels_Data_Frame["user_number_ID"]==int(user_id))&
-                             (Labels_Data_Frame["activity_number_ID"]==act)
-                            
-                            ][['Label_start_point','Label_end_point']].iloc[0]
+    try:
+        #################################### INPUTS ####################################################################
+        # inputs: Data_frame: Data frame contains acc and gyro signals                                                 #
+        #         exp_id: integer from 1 to 61 (the experience identifier)                                             #         
+        #         width: integer the width of the figure                                                               #
+        #         height: integer the height of the figure                                                             #
+        #         sig_type: string  'acc' to visualize 3-axial acceleration signals or 'gyro' for 3-axial gyro signals #
+        #         act: possible values: string: 'all' (to visualize full signals) ,                                    #
+        #              or integer from 1 to 12 to specify the activity id to be visualized                             #
+        #                                                                                                              #
+        #              if act is from 1 to 6 it will skip the first 250 rows(first 5 seconds) from                     #
+        #              the starting point of the activity and will visualize the next 400 rows (next 8 seconds)        #
+        #              if act is between 7 and 12  the function will visualize all rows(full duration) of the activity.# 
+        #################################################################################################################
         
-        if int(act) in [1,2,3,4,5,6]:# if the activity to be visualed is from 1 to 6 (basic activity)
-            # skip the first 250 rows(5 second)
-            start_point=start_point+250
+        
+        keys=sorted(raw_dic.keys()) # list contains 'expXX_userYY' sorted from 1 to 61
+        key=keys[exp_id-1] # the key associated to exp_id (experience)
+        exp_id=str(exp_id)
+        user_id=key[-2:] # the user id associated to this experience in string format
+        
+        if act=='all': # to visualize full signal
+            # selecting all rows in the dataframe to be visualized , the dataframe stored in raw_dic and has the same key
+            data_df=data_frame
+        else:# act is an integer from 1 to 12 (id of the activity to be visualized ) 
+            # Select rows in labels file having the same exp_Id and user_Id mentioned above + the activity id (act)
+            # selecting the first result in the search made in labels file
+            # and select the start point and end point of this row related to this activity Id (act) 
+            start_point,end_point=Labels_Data_Frame[(Labels_Data_Frame["experiment_number_ID"]==int(exp_id))&
+                                (Labels_Data_Frame["user_number_ID"]==int(user_id))&
+                                (Labels_Data_Frame["activity_number_ID"]==act)
+                                ][['Label_start_point','Label_end_point']].iloc[0]
             
-            # set the end point at distance of 400 rows (8seconds) from the start_point
-            end_point=start_point+400
-    
+            if int(act) in [1,2,3,4,5,6]:# if the activity to be visualed is from 1 to 6 (basic activity)
+                # skip the first 250 rows(5 second)
+                start_point=start_point+250
+                
+                # set the end point at distance of 400 rows (8seconds) from the start_point
+                end_point=start_point+400
         
-        # select the 8 seconds shifted by 5 seconds if act between 1 and 6 
-        # if act is between 7 and 12 select the full duration of the first result(row)
-        data_df=data_frame[start_point:end_point]
-    
-    ##################################
-    
-    columns=data_df.columns # a list contain all column names of the  (6 columns in total)
+            
+            # select the 8 seconds shifted by 5 seconds if act between 1 and 6 
+            # if act is between 7 and 12 select the full duration of the first result(row)
+            data_df=data_frame[start_point:end_point]
+        
+        ##################################
+        
+        columns=data_df.columns # a list contain all column names of the  (6 columns in total)
 
-    if sig_type=='acc':# if the columns to be visualized are acceleration columns
-        
-        # acceleration columns are the first 3 columns acc_X, acc_Y and acc_Z
-        X_component=data_df[columns[0]] # copy acc_X
-        Y_component=data_df[columns[1]] # copy acc_Y
-        Z_component=data_df[columns[2]] # copy acc_Z
-        
-        # accelerations legends
-        legend_X='acc_X'
-        legend_Y='acc_Y'
-        legend_Z='acc_Z'
+        if sig_type=='acc':# if the columns to be visualized are acceleration columns
+            
+            # acceleration columns are the first 3 columns acc_X, acc_Y and acc_Z
+            X_component=data_df[columns[0]] # copy acc_X
+            Y_component=data_df[columns[1]] # copy acc_Y
+            Z_component=data_df[columns[2]] # copy acc_Z
+            
+            # accelerations legends
+            legend_X='acc_X'
+            legend_Y='acc_Y'
+            legend_Z='acc_Z'
 
-        # the figure y axis info
-        figure_Ylabel='Acceleration in 1g'
-        
-        # select the right title in each case
-        
-        if act=='all':
-            title="acceleration signals for all activities performed by user "+ user_id +' in experience '+exp_id
-        
-        elif act in [1,2,3,4,5,6,7,8,9,10,11,12]:
-            title="acceleration signals of experience "+ exp_id+" while user "+ user_id +' was performing activity: '+str(act)+ '('+AL[act]+')'
+            # the figure y axis info
+            figure_Ylabel='Acceleration in 1g'
+            
+            # select the right title in each case
+            
+            if act=='all':
+                title="acceleration signals for all activities performed by user "+ user_id +' in experience '+exp_id
+            
+            elif act in [1,2,3,4,5,6,7,8,9,10,11,12]:
+                title="acceleration signals of experience "+ exp_id+" while user "+ user_id +' was performing activity: '+str(act)+ '('+AL[act]+')'
 
-    elif sig_type=='gyro':# if the columns to be visualized are gyro columns
-        
-        # gyro columns are the last 3 columns gyro_X, gyro_Y and gyro_Z
-        X_component=data_df[columns[3]] # copy gyro_X
-        Y_component=data_df[columns[4]] # copy gyro_Y
-        Z_component=data_df[columns[5]] # copy gyro_Z
-        
-        # gyro signals legends
-        legend_X='gyro_X'
-        legend_Y='gyro_Y'
-        legend_Z='gyro_Z'
-        
-        #the figure y axis info
-        figure_Ylabel='Angular Velocity in radian per second [rad/s]'
-        
-        # select the right title in each case 
-        if act=='all':
-            title="gyroscope signals for all activities performed by user "+ user_id +' in experience '+exp_id
-        elif act in [1,2,3,4,5,6,7,8,9,10,11,12]:
-            title="gyroscope signals of experience "+ exp_id+" while user "+ user_id +' was performing activity: '+str(act)+ '('+AL[act]+')'
+        elif sig_type=='gyro':# if the columns to be visualized are gyro columns
+            
+            # gyro columns are the last 3 columns gyro_X, gyro_Y and gyro_Z
+            X_component=data_df[columns[3]] # copy gyro_X
+            Y_component=data_df[columns[4]] # copy gyro_Y
+            Z_component=data_df[columns[5]] # copy gyro_Z
+            
+            # gyro signals legends
+            legend_X='gyro_X'
+            legend_Y='gyro_Y'
+            legend_Z='gyro_Z'
+            
+            #the figure y axis info
+            figure_Ylabel='Angular Velocity in radian per second [rad/s]'
+            
+            # select the right title in each case 
+            if act=='all':
+                title="gyroscope signals for all activities performed by user "+ user_id +' in experience '+exp_id
+            elif act in [1,2,3,4,5,6,7,8,9,10,11,12]:
+                title="gyroscope signals of experience "+ exp_id+" while user "+ user_id +' was performing activity: '+str(act)+ '('+AL[act]+')'
 
-    # chosing colors : red for X component blue for Y component and green for Z component
-    colors=['r','b','g']
-    len_df=len(data_df) # number of rows in this dataframe to be visualized(depends on 'act' variable)
-    
-    # converting row numbers into time duration (the duration between two rows is 1/50=0.02 second)
-    time=[1/float(sampling_freq) *j for j in range(len_df)]
-    
-    # Define the figure and setting dimensions width and height
-    fig = plt.figure(figsize=(width,height))
-    
-    # ploting each signal component
-    _ =plt.plot(time,X_component,color='r',label=legend_X)
-    _ =plt.plot(time,Y_component,color='b',label=legend_Y)
-    _ =plt.plot(time,Z_component,color='g',label=legend_Z)
-    
-    # Set the figure info defined earlier
-    _ = plt.ylabel(figure_Ylabel) # set Y axis info 
-    _ = plt.xlabel('Time in seconds (s)') # Set X axis info (same label in all cases)
-    _ = plt.title(title) # Set the title of the figure
-    
-    # localise the figure's legends
-    _ = plt.legend(loc="upper left")# upper left corner
-    
-    # showing the figure
-    plt.show()
+        # chosing colors : red for X component blue for Y component and green for Z component
+        colors=['r','b','g']
+        len_df=len(data_df) # number of rows in this dataframe to be visualized(depends on 'act' variable)
+        
+        # converting row numbers into time duration (the duration between two rows is 1/50=0.02 second)
+        time=[1/float(sampling_freq) *j for j in range(len_df)]
+        
+        # Define the figure and setting dimensions width and height
+        fig = plt.figure(figsize=(width,height))
+        
+        # ploting each signal component
+        _ =plt.plot(time,X_component,color='r',label=legend_X)
+        _ =plt.plot(time,Y_component,color='b',label=legend_Y)
+        _ =plt.plot(time,Z_component,color='g',label=legend_Z)
+        
+        # Set the figure info defined earlier
+        _ = plt.ylabel(figure_Ylabel) # set Y axis info 
+        _ = plt.xlabel('Time in seconds (s)') # Set X axis info (same label in all cases)
+        _ = plt.title(title) # Set the title of the figure
+        
+        # localise the figure's legends
+        _ = plt.legend(loc="upper left")# upper left corner
+        
+        # showing the figure
+        plt.show()
+    except Exception as ex:
+        prompt_exception("visualize_triaxial_signals", ex)
+
 
 # %% [markdown]
 # <a id='step234'></a>
@@ -753,7 +774,7 @@ def visualize_triaxial_signals(data_frame,exp_id,act,sig_type,width,height):
 visualize_triaxial_signals(sample01_01,   1   ,'all',    'acc'  ,  18 ,  5   )  
 # sig_type='acc' to visulize acceleration signals
 # act='all' to visualize full duration of the dataframe
-time_mark("visualize_triaxial_signals_sample01_01")
+mark_time("visualize_triaxial_signals_sample01_01")
 
 # %% [markdown]
 # * **2.** Visualzing gyroscope signals for all activities of experience 01
@@ -798,23 +819,24 @@ visualize_triaxial_signals(sample47_23,47,'all','gyro',18,5) # sig_type='gyro' t
 
 
 def look_up(exp_ID,activity_ID):
-    ######################################################################################
-    # Inputs:                                                                            #
-    #   exp_ID  : integer , the experiment Identifier from 1 to 61 (61 included)         #
-    #                                                                                    #
-    #   activity_ID: integer  the activity Identifier from 1 to 12 (12 included)         #
-    # Outputs:                                                                           #
-    #   dataframe: A pandas Dataframe which is a part of Labels_Data_Frame contains      #
-    #             the activity ID ,the start point  and the end point  of this activity  #
-    ######################################################################################
-    user_ID=int(sorted(raw_dic.keys())[exp_ID -1][-2:])
-    # To select rows in labels file of a fixed activity in a fixed experiment 
-    return Labels_Data_Frame[
-                             (Labels_Data_Frame["experiment_number_ID"]==exp_ID)&
-                             (Labels_Data_Frame["user_number_ID"]==user_ID)&
-                             (Labels_Data_Frame["activity_number_ID"]==activity_ID)
-                            
-                            ]
+    try:
+        ######################################################################################
+        # Inputs:                                                                            #
+        #   exp_ID  : integer , the experiment Identifier from 1 to 61 (61 included)         #
+        #                                                                                    #
+        #   activity_ID: integer  the activity Identifier from 1 to 12 (12 included)         #
+        # Outputs:                                                                           #
+        #   dataframe: A pandas Dataframe which is a part of Labels_Data_Frame contains      #
+        #             the activity ID ,the start point  and the end point  of this activity  #
+        ######################################################################################
+        user_ID=int(sorted(raw_dic.keys())[exp_ID -1][-2:])
+        # To select rows in labels file of a fixed activity in a fixed experiment 
+        return Labels_Data_Frame[(Labels_Data_Frame["experiment_number_ID"]==exp_ID)&
+                                 (Labels_Data_Frame["user_number_ID"]==user_ID)&
+                                 (Labels_Data_Frame["activity_number_ID"]==activity_ID)]
+    except Exception as ex:
+        prompt_exception("look_up", ex)
+        return None
 
 # %% [markdown]
 # - [**Return Back to Detailed visualizations** ](#step23)
@@ -830,8 +852,10 @@ for activity_Id in range(1,13):# iterating throw activity ids from 1 to 12
     # expID=47 
     # It returns all Label_start_point and Label_end_point of this (activityID,expID)
     print('Activity number '+str(activity_Id))
-    display(look_up(47,activity_Id)) # display the results of each search
-time_mark("look_up_1_13")
+    lk = look_up(47,activity_Id) # display the results of each search
+    if lk is not None:
+        display(lk)
+mark_time("look_up_1_13")
 
 # %% [markdown]
 # <a id='step238'></a>
@@ -857,7 +881,7 @@ time_mark("look_up_1_13")
 for act in range(1,7): # Iterating throw each activity Id from 1 to 6
     visualize_triaxial_signals(sample47_23,47,act,'acc',14,2) # visualize acc signals related to this activity
     visualize_triaxial_signals(sample47_23,47,act,'gyro',14,2) # visualize gyro signals reated to this activity
-time_mark("visualize_triaxial_signals_sample47_23")
+mark_time("visualize_triaxial_signals_sample47_23")
 
 # %% [markdown]
 # <a id='step240'></a>
@@ -979,7 +1003,7 @@ title2='the same 8 seconds after applying the median filter order 3'
 # skip the first 500 rows (10 seconds) visualize the next 400 rows (8 seconds) for both signals (the original and the filtred ones)
 visualize_signal(signal_sample[500:900],x_labels,y_labels,title1,legend1) 
 visualize_signal(med_filtred_signal[500:900],x_labels,y_labels,title2,legend2)
-time_mark("visualize_signal")
+mark_time("visualize_signal")
 
 # %% [markdown]
 # <a id='step3234'></a>
@@ -1147,6 +1171,7 @@ def verify_gravity(exp_id):
     
     visualize_signal(grav_acc_mag,x_labels,y_labels,title,legend) # visualize gravity magnitude signal
     print('mean value = '+str(np.array(grav_acc_mag).mean())[0:5]+ ' g') # print the gravity magnitude mean value
+    print('which means we have right signal seprateion on acc')
 
 # %% [markdown]
 # <a id='step32443'></a> 
@@ -1154,7 +1179,7 @@ def verify_gravity(exp_id):
 
 # %%
 verify_gravity(1) # apply the function to dataframe related to experience 01
-time_mark("verify_gravity")
+mark_time("verify_gravity")
 
 # %% [markdown]
 # <a id='step32444'></a>
@@ -1203,10 +1228,11 @@ def mag_3_signals(x,y,z):# magnitude function redefintion
 time_sig_dic={} # An empty dictionary will contains dataframes of all time domain signals
 raw_dic_keys=sorted(raw_dic.keys()) # sorting dataframes' keys
 
-pgb = ProgressBar(len(raw_dic_keys), "time_sig_dic")
-for key in raw_dic_keys: # iterate over each key in raw_dic
+mark_time("prepare_time_sig_dic:time_sig_dic out of raw_dic")
+pgb = ProgressBar(len(raw_dic_keys), "prep_time_sig_dic")
+for exp_user_key in raw_dic_keys: # iterate over each key in raw_dic
     pgb.inc()
-    raw_df=raw_dic[key] # copie the raw dataframe associated to 'expXX_userYY' from raw_dic
+    raw_df=raw_dic[exp_user_key] # copie the raw dataframe associated to 'expXX_userYY' from raw_dic
     
     time_sig_df=pd.DataFrame() # a dataframe will contain time domain signals
     
@@ -1268,7 +1294,9 @@ for key in raw_dic_keys: # iterate over each key in raw_dic
         ordered_time_sig_df[col]=time_sig_df[col] # store the column in the ordred dataframe
     
     # Generating magnitude signals
-    for i in range(0,15,3): # iterating over each 3-axial signals
+    num_col_walk = len(new_columns_ordered)
+    #for i in range(0,15,3): # iterating over each 3-axial signals
+    for i in range(0,num_col_walk,3): # iterating over each 3-axial signals
         
         mag_col_name=new_columns_ordered[i][:-1]+'mag'# Create the magnitude column name related to each 3-axial signals
         
@@ -1279,16 +1307,21 @@ for key in raw_dic_keys: # iterate over each key in raw_dic
         mag_signal=mag_3_signals(col0,col1,col2) # calculate magnitude of each signal[X,Y,Z]
         ordered_time_sig_df[mag_col_name]=mag_signal # store the signal_mag with its appropriate column name
     
-    time_sig_dic[key]=ordered_time_sig_df # store the ordred_time_sig_df in time_sig_dic with the appropriate key
+    time_sig_dic[exp_user_key]=ordered_time_sig_df # store the ordred_time_sig_df in time_sig_dic with the appropriate key
 
 # %% [markdown]
 # ##### Display a dataframe
 
 # %%
-display(time_sig_dic['exp01_user01'].shape) # the of the first dataframe
-display(time_sig_dic['exp01_user01'].describe()) # dataframe's statistics
-time_sig_dic['exp01_user01'].head(3) # displaying the fisrt three rows
-time_mark("time_sig_dic")
+tsdic0101 = time_sig_dic['exp01_user01']
+display(tsdic0101.shape) # the of the first dataframe
+display(tsdic0101.describe()) # dataframe's statistics
+tsdic0101.head(3) # displaying the fisrt three rows
+sorted_keys = sorted(tsdic0101.keys())
+print("time-related-features", len(sorted_keys), sorted_keys)
+mark_time("time_sig_dic")
+mark_milestone(
+    "time_sig_dic prepared -- not chopped into 128 by windows yet" + str(tsdic0101.shape))
 
 # %% [markdown]
 # <a id='step3263'></a>
@@ -1378,18 +1411,19 @@ def Windowing_type_1(time_sig_dic,Labels_Data_Frame):
             # end_point: cursor(the first index in the window) + 128
             end_point=cursor+128 # window end row
 
-            # selecting window data points convert them to numpy array to delete rows index
-            data=np.array(time_sig_dic[file_key].iloc[cursor:end_point])
+            if file_key in time_sig_dic:
+                # selecting window data points convert them to numpy array to delete rows index
+                data=np.array(time_sig_dic[file_key].iloc[cursor:end_point])
 
-            # converting numpy array to a dataframe with the same column names
-            window=pd.DataFrame(data=data,columns=columns)
+                # converting numpy array to a dataframe with the same column names
+                window=pd.DataFrame(data=data,columns=columns)
 
-            # creating the window
-            key='t_W'+normalize5(window_ID)+'_'+file_key+'_act'+normalize2(act_ID)
-            t_dic_win_type_I[key]=window
+                # creating the window
+                key='t_W'+normalize5(window_ID)+'_'+file_key+'_act'+normalize2(act_ID)
+                t_dic_win_type_I[key]=window
 
-            # incrementing the windowID by 1
-            window_ID=window_ID+1
+                # incrementing the windowID by 1
+                window_ID=window_ID+1
         
     return t_dic_win_type_I # return a dictionary including time domain windows type I
 
@@ -1401,7 +1435,20 @@ def Windowing_type_1(time_sig_dic,Labels_Data_Frame):
 # %%
 # apply the sliding window type 1 to "time_sig dic"
 t_dic_win_type_I  = Windowing_type_1(time_sig_dic,Labels_Data_Frame)
-time_mark("Windowing_type_1")
+prompt_highlight("time_sig_dic (20597,20) has chopped into (20,128) by sliding windows (labels_Data_Fame) into t_dic_win_type_I, with different key to access")
+prompt_highlight(
+    "t_dic_win_type_I only covers basic 6 activities defined: ", [Acitivity_labels[i] for i in range(1,7)])
+prompt_highlight("typical access key for t_dic_win_type_I are ", list(t_dic_win_type_I.keys())[0:3])
+twex = "t_W00000_exp01_user01_act05"
+if twex in t_dic_win_type_I:
+    item = t_dic_win_type_I[twex]
+    print("item of ", twex, "in t_dic_win_type_I")
+    print("shape of each item ", item.shape)
+    print("keys for item", len(item.keys()), item.keys())
+    print(item.head(3))
+prompt_highlight("total split windows defined by key as for t_dic_win_type_I", len(t_dic_win_type_I.keys()))
+mark_time("t_dic_win_type_I")
+mark_milestone("t_dic_win_type_I")
 
 # %% [markdown]
 # <a id='step3334'></a>
@@ -1541,7 +1588,22 @@ def Windowing_type_2(time_sig_dic,Labels_Data_Frame):
 # %%
 # apply the sliding window type 2 to "time_sig_dic"
 t_dic_win_type_II = Windowing_type_2(time_sig_dic,Labels_Data_Frame)
-time_mark("Windowing_type_2")
+prompt_highlight("time_sig_dic (20597,20) has chopped into (20,128) by sliding windows (labels_Data_Fame) into t_dic_win_type_I, with different key to access")
+prompt_highlight(
+    "t_dic_win_type_II covers all activities defined: ", [Acitivity_labels[i] for i in range(1,len(Acitivity_labels)-1)])
+
+prompt_highlight("typical access key for t_dic_win_type_II are ", list(t_dic_win_type_II.keys())[0:3])
+twex = "t_W00000_exp01_user01_act05"
+if twex in t_dic_win_type_II:
+    item = t_dic_win_type_II[twex]
+    print("item of ", twex, "in t_dic_win_type_II")
+    print("shape of each item ", item.shape)
+    print("keys for item", len(item.keys()), item.keys())
+    print(item.head(3))
+prompt_highlight("total split windows defined by key as for t_dic_win_type_II",
+      len(t_dic_win_type_II.keys()))
+mark_time("t_dic_win_type_II")
+mark_milestone("t_dic_win_type_II")
 
 # %% [markdown]
 # <a id='step3346'></a>
@@ -1598,10 +1660,13 @@ def fast_fourier_transform(t_window):
 # ####  Step 2: Apply it to one sample
 # 
 
+
 # %%
 # generating 1 frequency domain window for verfication
-t_dic_win_type_II['t_W00000_exp01_user01_act05'].pipe(fast_fourier_transform).head(3)
-# time_mark("t_dic_win_type_II(t_W00000_exp01_user01_act05)")
+# prompt_highlight(
+#    "demo a typical fft of t_dic_win_type_II(t_W00000_exp01_user01_act05)")
+# print(t_dic_win_type_II['t_W00000_exp01_user01_act05'].pipe(fast_fourier_transform).head(3))
+# mark_time("t_dic_win_type_II(t_W00000_exp01_user01_act05)")
 # %% [markdown]
 # ##### Discussion
 # %% [markdown]
@@ -1610,29 +1675,52 @@ t_dic_win_type_II['t_W00000_exp01_user01_act05'].pipe(fast_fourier_transform).he
 
 # %%
 # dictionaries includes f_windows obtained from t_windows type I and type II
-time_mark("f_dic_win_type_I_start")
+mark_milestone("prepare f_dic_win_type out of t_dic_win_type")
+mark_time("f_dic_win_type_I_start")
 # f_dic_win_type_I = {'f'+key[1:] : t_w1_df.pipe(fast_fourier_transform) for key, t_w1_df in t_dic_win_type_I.items()}
 f_dic_win_type_I = {}
 pgb = ProgressBar(len(t_dic_win_type_I), "f_dic_win_type_I")
 for key, t_w1_df in t_dic_win_type_I.items():
     pgb.inc()
     f_dic_win_type_I['f'+key[1:]] = t_w1_df.pipe(fast_fourier_transform)
+fwex = "f_W00000_exp01_user01_act05"
+if fwex in f_dic_win_type_I:
+    item = f_dic_win_type_I[fwex]
+    print("item of ", twex, "in f_dic_win_type_I")
+    print("shape of each item ", item.shape)
+    print("keys for item", len(item.keys()), item.keys())
+    print(item.head(3))
+prompt_highlight("f_dic_win_type_I out of t_dic_win_type_I",
+                 len(f_dic_win_type_I.keys()), "typical key: ", list(f_dic_win_type_I.keys())[0:3])
+mark_time("f_dic_win_type_I_end")
+mark_milestone("f_dic_win_type_I")
 
-time_mark("f_dic_win_type_I_end")
-time_mark("f_dic_win_type_II_start")
+
+mark_time("f_dic_win_type_II_start")
 #f_dic_win_type_II = {'f'+key[1:] : t_w2_df.pipe(fast_fourier_transform) for key, t_w2_df in t_dic_win_type_II.items()}
 f_dic_win_type_II = {}
-pgb = ProgressBar(len(t_dic_win_type_II), "f_dic_win_type_I")
+pgb = ProgressBar(len(t_dic_win_type_II), "f_dic_win_type_II")
 for key, t_w2_df in t_dic_win_type_II.items():
     pgb.inc()
     f_dic_win_type_II['f'+key[1:]] = t_w2_df.pipe(fast_fourier_transform)
-time_mark("f_dic_win_type_II_end")
+fwex = "f_W00000_exp01_user01_act05"
+if fwex in f_dic_win_type_II:
+    item = f_dic_win_type_II[fwex]
+    print("item of ", twex, "in f_dic_win_type_II")
+    print("shape of each item ", item.shape)
+    print("keys for item", len(item.keys()), item.keys())
+    print(item.head(3))
+prompt_highlight("f_dic_win_type_II out of t_dic_win_type_II",
+                 len(f_dic_win_type_II.keys()), "typical key: ", list(f_dic_win_type_II.keys())[0:3])
+mark_time("f_dic_win_type_II_end")
+mark_milestone("f_dic_win_type_II")
+
 
 # %%
 # displaying the first f_window type I
 f_window = f_dic_win_type_I[sorted(f_dic_win_type_I.keys())[0]]
 f_window.head()
-time_mark("f_window")
+mark_time("f_window")
 
 # %% [markdown]
 # <a id='step3355'></a>
@@ -1864,8 +1952,12 @@ def _arburg2(X, order):
         eb = ebp + ref[m].conj().transpose() * efp
 
         # Update the AR coeff.
-        a.resize(len(a)+1)
-        a = a + ref[m] * numpy.flipud(a).conjugate()
+        try:
+            #a.resize(len(a)+1)
+            numpy.resize(a, len(a)+1)
+            a = a + ref[m] * numpy.flipud(a).conjugate()
+        except Exception as ex:
+            prompt_exception("_arburg2", ex)
 
         # Update the prediction error
         E[m+1] = numpy.real((1 - ref[m].conj().transpose() * ref[m])) * E[m]
@@ -2155,9 +2247,9 @@ def f_energy_axial(df):
 ####### Max Inds and Mean_Freq Functions#######################################
 # built frequencies list (each column contain 128 value)
 # duration between each two successive captures is 0.02 s= 1/50hz
-time_mark("fftfreq_start")
+mark_time("fftfreq_start")
 freqs=sp.fftpack.fftfreq(128, d=0.02) 
-time_mark("fftfreq_end")
+mark_time("fftfreq_end")
   
 
 # max_Inds
@@ -2602,6 +2694,7 @@ angle_columns=['angle0()','angle1()','angle2()','angle3()','angle4()','angle5()'
 # %%
 # conctenate all features names lists and we add two other columns activity ids and user ids will be related to each row
 all_columns=time_features_names()+frequency_features_names()+angle_columns+['activity_Id','user_Id']
+print("all_colums", len(all_columns), all_columns)
 
 def Dataset_Generation_PipeLine(t_dic,f_dic):
     # t_dic is a dic contains time domain windows
@@ -2635,12 +2728,15 @@ def Dataset_Generation_PipeLine(t_dic,f_dic):
         # concatenate all features and append the activity id and the user id
         row= time_features + frequency_features + additional_features + [int(window_activity_id),int(window_user_id)]
         
-        # go to the first free index in the dataframe
-        free_index=len(final_Dataset)
-        
-        # append the row
-        final_Dataset.loc[free_index]= row
-        
+        try:
+            # go to the first free index in the dataframe
+            free_index=len(final_Dataset)
+            
+            # append the row
+            final_Dataset.loc[free_index]= row
+        except Exception as ex:
+            prompt_exception("Dataset_Generation_PipeLine", ex)
+            
     return final_Dataset # return the final dataset
 
 # %% [markdown]
@@ -2649,9 +2745,9 @@ def Dataset_Generation_PipeLine(t_dic,f_dic):
 
 # %%
 # apply datasets generation pipeline to time and frequency windows type I
-time_mark("Dataset_Generation_PipeLine_start_I")
+mark_time("Dataset_Generation_PipeLine_start_I")
 Dataset_type_I= Dataset_Generation_PipeLine(t_dic_win_type_I,f_dic_win_type_I)
-time_mark("Dataset_Generation_PipeLine_end_I")
+mark_time("Dataset_Generation_PipeLine_end_I")
 
 print('The shape of Dataset type I is :',Dataset_type_I.shape) # shape of the dataset type I
 display(Dataset_type_I.describe()) # statistical description
@@ -2663,9 +2759,9 @@ display(Dataset_type_I.head(3)) # the first three rows
 
 # %%
 # apply datasets generation pipeline to time and frequency windows type II
-time_mark("Dataset_Generation_PipeLine_start_II")
+mark_time("Dataset_Generation_PipeLine_start_II")
 Dataset_type_II=Dataset_Generation_PipeLine(t_dic_win_type_II,f_dic_win_type_II)
-time_mark("Dataset_Generation_PipeLine_end_II")
+mark_time("Dataset_Generation_PipeLine_end_II")
 print('The shape of Dataset type II is :',Dataset_type_II.shape)
 display(Dataset_type_II.describe())
 display(Dataset_type_II.head(3))
@@ -2733,7 +2829,7 @@ Dataset_type_II_part2.to_csv(path_or_buf=path4, na_rep='NaN',
 # %%
 end_time=timer()
 print ('Full Duration in seconds :', end_time-start_time)
-time_mark("X_End")
+mark_time("X_End")
 
 # %% [markdown]
 # * **The dataset exported to newData folder will be used as inputs of the machine learning part**

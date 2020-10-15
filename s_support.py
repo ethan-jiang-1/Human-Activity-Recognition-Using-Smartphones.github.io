@@ -6,7 +6,7 @@ start_time=timer()
 
 last_mark_time = None
 last_mark = None
-def time_mark(mark):
+def mark_time(mark):
     global last_mark, last_mark_time
     now = timer()
     if last_mark_time is None:
@@ -17,6 +17,25 @@ def time_mark(mark):
     last_mark = mark
     last_mark_time = now
 
+def mark_milestone(mark):
+    print("\033[0;33m" + mark + "\033[0;0m")
+    print("\n\n")
+
+
+def prompt_highlight(mark, *args):
+    line = ""
+    for arg in args:
+        line += str(arg) + " "
+    print("\033[0;36m" + str(mark)  + " " + line + "\033[0;0m")
+
+
+def prompt_exception(mark, ex):
+    if mark is not None:
+        if mark.find("visualize_triaxial_signals") != -1:
+            return
+        if mark.find("look_up") != -1:
+            return
+    print("\033[0;31m" + str(ex) + " @" + str(mark) + "\033[0;0m")
 
 
 class ProgressBar:
@@ -92,4 +111,9 @@ def turn_off_plt():
     plt.show = _show_nothing
       
 
-##ethan##
+flags = []
+flags.append("FlSkipRaw")
+def has_flag(flag):
+    if flag in flags:
+        return True
+    return False

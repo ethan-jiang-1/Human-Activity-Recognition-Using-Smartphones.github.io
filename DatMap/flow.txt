@@ -51,11 +51,77 @@ t_mag_features_generation generate followings:
     AR_vector    = t_arburg_mag(mag_columns[col])# 1 value
 
     13 features for each, total of 13*3 features
-        t_boday_acc_Mag_xxx,
+        t_body_acc_Mag_xxx,
         t_grav_acc_Mag_xxx
         t_body_acc_jerk_Mag_xxx
 
 
 
 --- Frequency features ---------------
+
+def f_axial_features_generation(f_window):
+    # mean
+    mean_vector                  = mean_axial(df) # 3 values
+    # std
+    std_vector                   = std_axial(df) # 3 values
+    # mad
+    mad_vector                   = mad_axial(df) # 3 values
+    # max
+    max_vector                   = max_axial(df) # 3 values
+    # min
+    min_vector                   = min_axial(df) # 3 values
+    # sma
+    sma_value                    = f_sma_axial(df)
+    # energy
+    energy_vector                = f_energy_axial(df)# 3 values
+    # IQR
+    IQR_vector                   = IQR_axial(df) # 3 values
+    # entropy
+    entropy_vector               = entropy_axial(df) # 3 values
+    # max_inds
+    max_inds_vector              = f_max_Inds_axial(df)# 3 values
+    # mean_Freq
+    mean_Freq_vector             = f_mean_Freq_axial(df)# 3 values
+    # skewness and kurtosis
+    skewness_and_kurtosis_vector = f_skewness_and_kurtosis_axial(df)# 6 values
+    # bands energy
+    bands_energy_vector          = f_all_bands_energy_axial(df) # 42 values
+
+    79 features for each 79*2
+        f_body_acc_XXX
+        f_body_Jeck_XXX
+
+def f_mag_features_generation(f_window):
+    mean_value   = mean_mag(mag_columns[col])
+    std_value    = std_mag(mag_columns[col])
+    mad_value    = mad_mag(mag_columns[col])
+    max_value    = max_mag(mag_columns[col])
+    min_value    = min_mag(mag_columns[col])
+    sma_value    = f_sma_mag(mag_columns[col])
+    energy_value = f_energy_mag(mag_columns[col])
+    IQR_value    = IQR_mag(mag_columns[col])
+    entropy_value= entropy_mag(mag_columns[col])
+    max_Inds_value=f_max_Inds_mag(mag_columns[col])
+    mean_Freq_value= f_mean_Freq_mag (mag_columns[col])
+    skewness_value=  f_skewness_mag(mag_columns[col])
+    kurtosis_value = f_kurtosis_mag(mag_columns[col])
+
+
+    13 mag for body_acc and boady_acc_jerk 13*2
+        f_body_acc_Mag_xxx
+        f_body_acc_Jerk_Mag_xxx
+
+
+------ Extra Angle ---------------
+
+555 angle(tBodyAccMean,gravity)
+556 angle(tBodyAccJerkMean),gravityMean)
+    557 angle(tBodyGyroMean,gravityMean)
+    558 angle(tBodyGyroJerkMean,gravityMean)
+559 angle(X,gravityMean)
+560 angle(Y,gravityMean)
+561 angle(Z,gravityMean)
+
+
+
 

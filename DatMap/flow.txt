@@ -1,0 +1,61 @@
+raw_acc_X, raw_acc_Y, raw_acc_Z
+
+      convert to 
+
+['t_body_acc_X','t_body_acc_Y','t_body_acc_Z',
+'t_grav_acc_X','t_grav_acc_Y','t_grav_acc_Z']
+
+      prepare  on top of t_body_acc_?
+
+['t_body_acc_jerk_X','t_body_acc_jerk_Y','t_body_acc_jerk_Z']
+
+
+    fft output
+
+['f_body_acc_X','f_body_acc_Y','f_body_acc_Z',
+  f_body_acc_jerk_X','f_body_acc_jerk_Y','f_body_acc_jerk_Z']
+
+
+--- Time features ------------------
+
+t_axial_features_generation generate followings:
+
+    mean_vector   = mean_axial(df) # 3values
+    std_vector    = std_axial(df) # 3 values
+    mad_vector    = mad_axial(df)# 3 values
+    max_vector    = max_axial(df)# 3 values
+    min_vector    = min_axial(df)# 3 values
+    sma_value     = t_sma_axial(df)# 1 value
+    energy_vector = t_energy_axial(df)# 3 values
+    IQR_vector    = IQR_axial(df)# 3 values
+    entropy_vector= entropy_axial(df)# 3 values
+    AR_vector     = t_arburg_axial(df)# 3 values
+    corr_vector   = t_corr_axial(df)# 3 values
+
+     40 features for each, total of 120 features: 
+        t_body_acc_xxx,
+        t_grav_acc_xxx,
+        t_body_acc_jerk_xxx,
+
+
+t_mag_features_generation generate followings:
+    mean_value   = mean_mag(mag_columns[col]) # 1 value
+    std_value    = std_mag(mag_columns[col])# 1 value
+    mad_value    = mad_mag(mag_columns[col])# 1 value
+    max_value    = max_mag(mag_columns[col])# 1 value
+    min_value    = min_mag(mag_columns[col])# 1 value
+    sma_value    = t_sma_mag(mag_columns[col])# 1 value
+    energy_value = t_energy_mag(mag_columns[col])# 1 value
+    IQR_value    = IQR_mag(mag_columns[col])# 1 value
+    entropy_value= entropy_mag(mag_columns[col])# 1 value
+    AR_vector    = t_arburg_mag(mag_columns[col])# 1 value
+
+    13 features for each, total of 13*3 features
+        t_boday_acc_Mag_xxx,
+        t_grav_acc_Mag_xxx
+        t_body_acc_jerk_Mag_xxx
+
+
+
+--- Frequency features ---------------
+

@@ -38,6 +38,7 @@
 38 t_body_acc_Corr(X,Y)
 39 t_body_acc_Corr(X,Z)
 40 t_body_acc_Corr(Y,Z)
+
 41 t_grav_acc_mean()_X
 42 t_grav_acc_mean()_Y
 43 t_grav_acc_mean()_Z
@@ -78,6 +79,7 @@
 78 t_grav_acc_Corr(X,Y)
 79 t_grav_acc_Corr(X,Z)
 80 t_grav_acc_Corr(Y,Z)
+
 81 t_body_acc_jerk_mean()_X
 82 t_body_acc_jerk_mean()_Y
 83 t_body_acc_jerk_mean()_Z
@@ -118,86 +120,88 @@
 118 t_body_acc_jerk_Corr(X,Y)
 119 t_body_acc_jerk_Corr(X,Z)
 120 t_body_acc_jerk_Corr(Y,Z)
-121 t_body_gyro_mean()_X
-122 t_body_gyro_mean()_Y
-123 t_body_gyro_mean()_Z
-124 t_body_gyro_std()_X
-125 t_body_gyro_std()_Y
-126 t_body_gyro_std()_Z
-127 t_body_gyro_mad()_X
-128 t_body_gyro_mad()_Y
-129 t_body_gyro_mad()_Z
-130 t_body_gyro_max()_X
-131 t_body_gyro_max()_Y
-132 t_body_gyro_max()_Z
-133 t_body_gyro_min()_X
-134 t_body_gyro_min()_Y
-135 t_body_gyro_min()_Z
-136 t_body_gyro_sma()
-137 t_body_gyro_energy()_X
-138 t_body_gyro_energy()_Y
-139 t_body_gyro_energy()_Z
-140 t_body_gyro_iqr()_X
-141 t_body_gyro_iqr()_Y
-142 t_body_gyro_iqr()_Z
-143 t_body_gyro_entropy()_X
-144 t_body_gyro_entropy()_Y
-145 t_body_gyro_entropy()_Z
-146 t_body_gyro_AR1()_X
-147 t_body_gyro_AR2()_X
-148 t_body_gyro_AR3()_X
-149 t_body_gyro_AR4()_X
-150 t_body_gyro_AR1()_Y
-151 t_body_gyro_AR2()_Y
-152 t_body_gyro_AR3()_Y
-153 t_body_gyro_AR4()_Y
-154 t_body_gyro_AR1()_Z
-155 t_body_gyro_AR2()_Z
-156 t_body_gyro_AR3()_Z
-157 t_body_gyro_AR4()_Z
-158 t_body_gyro_Corr(X,Y)
-159 t_body_gyro_Corr(X,Z)
-160 t_body_gyro_Corr(Y,Z)
-161 t_body_gyro_Jerk_mean()_X
-162 t_body_gyro_Jerk_mean()_Y
-163 t_body_gyro_Jerk_mean()_Z
-164 t_body_gyro_Jerk_std()_X
-165 t_body_gyro_Jerk_std()_Y
-166 t_body_gyro_Jerk_std()_Z
-167 t_body_gyro_Jerk_mad()_X
-168 t_body_gyro_Jerk_mad()_Y
-169 t_body_gyro_Jerk_mad()_Z
-170 t_body_gyro_Jerk_max()_X
-171 t_body_gyro_Jerk_max()_Y
-172 t_body_gyro_Jerk_max()_Z
-173 t_body_gyro_Jerk_min()_X
-174 t_body_gyro_Jerk_min()_Y
-175 t_body_gyro_Jerk_min()_Z
-176 t_body_gyro_Jerk_sma()
-177 t_body_gyro_Jerk_energy()_X
-178 t_body_gyro_Jerk_energy()_Y
-179 t_body_gyro_Jerk_energy()_Z
-180 t_body_gyro_Jerk_iqr()_X
-181 t_body_gyro_Jerk_iqr()_Y
-182 t_body_gyro_Jerk_iqr()_Z
-183 t_body_gyro_Jerk_entropy()_X
-184 t_body_gyro_Jerk_entropy()_Y
-185 t_body_gyro_Jerk_entropy()_Z
-186 t_body_gyro_Jerk_AR1()_X
-187 t_body_gyro_Jerk_AR2()_X
-188 t_body_gyro_Jerk_AR3()_X
-189 t_body_gyro_Jerk_AR4()_X
-190 t_body_gyro_Jerk_AR1()_Y
-191 t_body_gyro_Jerk_AR2()_Y
-192 t_body_gyro_Jerk_AR3()_Y
-193 t_body_gyro_Jerk_AR4()_Y
-194 t_body_gyro_Jerk_AR1()_Z
-195 t_body_gyro_Jerk_AR2()_Z
-196 t_body_gyro_Jerk_AR3()_Z
-197 t_body_gyro_Jerk_AR4()_Z
-198 t_body_gyro_Jerk_Corr(X,Y)
-199 t_body_gyro_Jerk_Corr(X,Z)
-200 t_body_gyro_Jerk_Corr(Y,Z)
+
+    121 t_body_gyro_mean()_X
+    122 t_body_gyro_mean()_Y
+    123 t_body_gyro_mean()_Z
+    124 t_body_gyro_std()_X
+    125 t_body_gyro_std()_Y
+    126 t_body_gyro_std()_Z
+    127 t_body_gyro_mad()_X
+    128 t_body_gyro_mad()_Y
+    129 t_body_gyro_mad()_Z
+    130 t_body_gyro_max()_X
+    131 t_body_gyro_max()_Y
+    132 t_body_gyro_max()_Z
+    133 t_body_gyro_min()_X
+    134 t_body_gyro_min()_Y
+    135 t_body_gyro_min()_Z
+    136 t_body_gyro_sma()
+    137 t_body_gyro_energy()_X
+    138 t_body_gyro_energy()_Y
+    139 t_body_gyro_energy()_Z
+    140 t_body_gyro_iqr()_X
+    141 t_body_gyro_iqr()_Y
+    142 t_body_gyro_iqr()_Z
+    143 t_body_gyro_entropy()_X
+    144 t_body_gyro_entropy()_Y
+    145 t_body_gyro_entropy()_Z
+    146 t_body_gyro_AR1()_X
+    147 t_body_gyro_AR2()_X
+    148 t_body_gyro_AR3()_X
+    149 t_body_gyro_AR4()_X
+    150 t_body_gyro_AR1()_Y
+    151 t_body_gyro_AR2()_Y
+    152 t_body_gyro_AR3()_Y
+    153 t_body_gyro_AR4()_Y
+    154 t_body_gyro_AR1()_Z
+    155 t_body_gyro_AR2()_Z
+    156 t_body_gyro_AR3()_Z
+    157 t_body_gyro_AR4()_Z
+    158 t_body_gyro_Corr(X,Y)
+    159 t_body_gyro_Corr(X,Z)
+    160 t_body_gyro_Corr(Y,Z)
+    161 t_body_gyro_Jerk_mean()_X
+    162 t_body_gyro_Jerk_mean()_Y
+    163 t_body_gyro_Jerk_mean()_Z
+    164 t_body_gyro_Jerk_std()_X
+    165 t_body_gyro_Jerk_std()_Y
+    166 t_body_gyro_Jerk_std()_Z
+    167 t_body_gyro_Jerk_mad()_X
+    168 t_body_gyro_Jerk_mad()_Y
+    169 t_body_gyro_Jerk_mad()_Z
+    170 t_body_gyro_Jerk_max()_X
+    171 t_body_gyro_Jerk_max()_Y
+    172 t_body_gyro_Jerk_max()_Z
+    173 t_body_gyro_Jerk_min()_X
+    174 t_body_gyro_Jerk_min()_Y
+    175 t_body_gyro_Jerk_min()_Z
+    176 t_body_gyro_Jerk_sma()
+    177 t_body_gyro_Jerk_energy()_X
+    178 t_body_gyro_Jerk_energy()_Y
+    179 t_body_gyro_Jerk_energy()_Z
+    180 t_body_gyro_Jerk_iqr()_X
+    181 t_body_gyro_Jerk_iqr()_Y
+    182 t_body_gyro_Jerk_iqr()_Z
+    183 t_body_gyro_Jerk_entropy()_X
+    184 t_body_gyro_Jerk_entropy()_Y
+    185 t_body_gyro_Jerk_entropy()_Z
+    186 t_body_gyro_Jerk_AR1()_X
+    187 t_body_gyro_Jerk_AR2()_X
+    188 t_body_gyro_Jerk_AR3()_X
+    189 t_body_gyro_Jerk_AR4()_X
+    190 t_body_gyro_Jerk_AR1()_Y
+    191 t_body_gyro_Jerk_AR2()_Y
+    192 t_body_gyro_Jerk_AR3()_Y
+    193 t_body_gyro_Jerk_AR4()_Y
+    194 t_body_gyro_Jerk_AR1()_Z
+    195 t_body_gyro_Jerk_AR2()_Z
+    196 t_body_gyro_Jerk_AR3()_Z
+    197 t_body_gyro_Jerk_AR4()_Z
+    198 t_body_gyro_Jerk_Corr(X,Y)
+    199 t_body_gyro_Jerk_Corr(X,Z)
+    200 t_body_gyro_Jerk_Corr(Y,Z)
+
 201 t_body_acc_Mag_mean()
 202 t_body_acc_Mag_std()
 203 t_body_acc_Mag_mad()
@@ -211,6 +215,7 @@
 211 t_body_acc_Mag_AR2()
 212 t_body_acc_Mag_AR3()
 213 t_body_acc_Mag_AR4()
+
 214 t_grav_acc_Mag_mean()
 215 t_grav_acc_Mag_std()
 216 t_grav_acc_Mag_mad()
@@ -224,6 +229,7 @@
 224 t_grav_acc_Mag_AR2()
 225 t_grav_acc_Mag_AR3()
 226 t_grav_acc_Mag_AR4()
+
 227 t_body_acc_jerk_Mag_mean()
 228 t_body_acc_jerk_Mag_std()
 229 t_body_acc_jerk_Mag_mad()
@@ -237,32 +243,35 @@
 237 t_body_acc_jerk_Mag_AR2()
 238 t_body_acc_jerk_Mag_AR3()
 239 t_body_acc_jerk_Mag_AR4()
-240 t_body_gyro_Mag_mean()
-241 t_body_gyro_Mag_std()
-242 t_body_gyro_Mag_mad()
-243 t_body_gyro_Mag_max()
-244 t_body_gyro_Mag_min()
-245 t_body_gyro_Mag_sma()
-246 t_body_gyro_Mag_energy()
-247 t_body_gyro_Mag_iqr()
-248 t_body_gyro_Mag_entropy()
-249 t_body_gyro_Mag_AR1()
-250 t_body_gyro_Mag_AR2()
-251 t_body_gyro_Mag_AR3()
-252 t_body_gyro_Mag_AR4()
-253 t_body_gyro_Jerk_Mag_mean()
-254 t_body_gyro_Jerk_Mag_std()
-255 t_body_gyro_Jerk_Mag_mad()
-256 t_body_gyro_Jerk_Mag_max()
-257 t_body_gyro_Jerk_Mag_min()
-258 t_body_gyro_Jerk_Mag_sma()
-259 t_body_gyro_Jerk_Mag_energy()
-260 t_body_gyro_Jerk_Mag_iqr()
-261 t_body_gyro_Jerk_Mag_entropy()
-262 t_body_gyro_Jerk_Mag_AR1()
-263 t_body_gyro_Jerk_Mag_AR2()
-264 t_body_gyro_Jerk_Mag_AR3()
-265 t_body_gyro_Jerk_Mag_AR4()
+
+    240 t_body_gyro_Mag_mean()
+    241 t_body_gyro_Mag_std()
+    242 t_body_gyro_Mag_mad()
+    243 t_body_gyro_Mag_max()
+    244 t_body_gyro_Mag_min()
+    245 t_body_gyro_Mag_sma()
+    246 t_body_gyro_Mag_energy()
+    247 t_body_gyro_Mag_iqr()
+    248 t_body_gyro_Mag_entropy()
+    249 t_body_gyro_Mag_AR1()
+    250 t_body_gyro_Mag_AR2()
+    251 t_body_gyro_Mag_AR3()
+    252 t_body_gyro_Mag_AR4()
+    253 t_body_gyro_Jerk_Mag_mean()
+    254 t_body_gyro_Jerk_Mag_std()
+    255 t_body_gyro_Jerk_Mag_mad()
+    256 t_body_gyro_Jerk_Mag_max()
+    257 t_body_gyro_Jerk_Mag_min()
+    258 t_body_gyro_Jerk_Mag_sma()
+    259 t_body_gyro_Jerk_Mag_energy()
+    260 t_body_gyro_Jerk_Mag_iqr()
+    261 t_body_gyro_Jerk_Mag_entropy()
+    262 t_body_gyro_Jerk_Mag_AR1()
+    263 t_body_gyro_Jerk_Mag_AR2()
+    264 t_body_gyro_Jerk_Mag_AR3()
+    265 t_body_gyro_Jerk_Mag_AR4()
+
+
 266 f_body_acc_mean()_X
 267 f_body_acc_mean()_Y
 268 f_body_acc_mean()_Z
@@ -342,6 +351,7 @@
 342 f_body_acc_BE[49-64]_Z
 343 f_body_acc_BE[1-24]_Z
 344 f_body_acc_BE[25-48]_Z
+
 345 f_body_acc_Jerk_mean()_X
 346 f_body_acc_Jerk_mean()_Y
 347 f_body_acc_Jerk_mean()_Z
@@ -421,164 +431,166 @@
 421 f_body_acc_Jerk_BE[49-64]_Z
 422 f_body_acc_Jerk_BE[1-24]_Z
 423 f_body_acc_Jerk_BE[25-48]_Z
-424 f_body_gyro_mean()_X
-425 f_body_gyro_mean()_Y
-426 f_body_gyro_mean()_Z
-427 f_body_gyro_std()_X
-428 f_body_gyro_std()_Y
-429 f_body_gyro_std()_Z
-430 f_body_gyro_mad()_X
-431 f_body_gyro_mad()_Y
-432 f_body_gyro_mad()_Z
-433 f_body_gyro_max()_X
-434 f_body_gyro_max()_Y
-435 f_body_gyro_max()_Z
-436 f_body_gyro_min()_X
-437 f_body_gyro_min()_Y
-438 f_body_gyro_min()_Z
-439 f_body_gyro_sma()
-440 f_body_gyro_energy()_X
-441 f_body_gyro_energy()_Y
-442 f_body_gyro_energy()_Z
-443 f_body_gyro_iqr()_X
-444 f_body_gyro_iqr()_Y
-445 f_body_gyro_iqr()_Z
-446 f_body_gyro_entropy()_X
-447 f_body_gyro_entropy()_Y
-448 f_body_gyro_entropy()_Z
-449 f_body_gyro_maxInd()_X
-450 f_body_gyro_maxInd()_Y
-451 f_body_gyro_maxInd()_Z
-452 f_body_gyro_meanFreq()_X
-453 f_body_gyro_meanFreq()_Y
-454 f_body_gyro_meanFreq()_Z
-455 f_body_gyro_skewness()_X
-456 f_body_gyro_kurtosis()_X
-457 f_body_gyro_skewness()_Y
-458 f_body_gyro_kurtosis()_Y
-459 f_body_gyro_skewness()_Z
-460 f_body_gyro_kurtosis()_Z
-461 f_body_gyro_BE[1-8]_X
-462 f_body_gyro_BE[9-16]_X
-463 f_body_gyro_BE[17-24]_X
-464 f_body_gyro_BE[25-32]_X
-465 f_body_gyro_BE[33-40]_X
-466 f_body_gyro_BE[41-48]_X
-467 f_body_gyro_BE[49-56]_X
-468 f_body_gyro_BE[57-64]_X
-469 f_body_gyro_BE[1-16]_X
-470 f_body_gyro_BE[17-32]_X
-471 f_body_gyro_BE[33-48]_X
-472 f_body_gyro_BE[49-64]_X
-473 f_body_gyro_BE[1-24]_X
-474 f_body_gyro_BE[25-48]_X
-475 f_body_gyro_BE[1-8]_Y
-476 f_body_gyro_BE[9-16]_Y
-477 f_body_gyro_BE[17-24]_Y
-478 f_body_gyro_BE[25-32]_Y
-479 f_body_gyro_BE[33-40]_Y
-480 f_body_gyro_BE[41-48]_Y
-481 f_body_gyro_BE[49-56]_Y
-482 f_body_gyro_BE[57-64]_Y
-483 f_body_gyro_BE[1-16]_Y
-484 f_body_gyro_BE[17-32]_Y
-485 f_body_gyro_BE[33-48]_Y
-486 f_body_gyro_BE[49-64]_Y
-487 f_body_gyro_BE[1-24]_Y
-488 f_body_gyro_BE[25-48]_Y
-489 f_body_gyro_BE[1-8]_Z
-490 f_body_gyro_BE[9-16]_Z
-491 f_body_gyro_BE[17-24]_Z
-492 f_body_gyro_BE[25-32]_Z
-493 f_body_gyro_BE[33-40]_Z
-494 f_body_gyro_BE[41-48]_Z
-495 f_body_gyro_BE[49-56]_Z
-496 f_body_gyro_BE[57-64]_Z
-497 f_body_gyro_BE[1-16]_Z
-498 f_body_gyro_BE[17-32]_Z
-499 f_body_gyro_BE[33-48]_Z
-500 f_body_gyro_BE[49-64]_Z
-501 f_body_gyro_BE[1-24]_Z
-502 f_body_gyro_BE[25-48]_Z
-503 f_body_gyro_Jerk_mean()_X
-504 f_body_gyro_Jerk_mean()_Y
-505 f_body_gyro_Jerk_mean()_Z
-506 f_body_gyro_Jerk_std()_X
-507 f_body_gyro_Jerk_std()_Y
-508 f_body_gyro_Jerk_std()_Z
-509 f_body_gyro_Jerk_mad()_X
-510 f_body_gyro_Jerk_mad()_Y
-511 f_body_gyro_Jerk_mad()_Z
-512 f_body_gyro_Jerk_max()_X
-513 f_body_gyro_Jerk_max()_Y
-514 f_body_gyro_Jerk_max()_Z
-515 f_body_gyro_Jerk_min()_X
-516 f_body_gyro_Jerk_min()_Y
-517 f_body_gyro_Jerk_min()_Z
-518 f_body_gyro_Jerk_sma()
-519 f_body_gyro_Jerk_energy()_X
-520 f_body_gyro_Jerk_energy()_Y
-521 f_body_gyro_Jerk_energy()_Z
-522 f_body_gyro_Jerk_iqr()_X
-523 f_body_gyro_Jerk_iqr()_Y
-524 f_body_gyro_Jerk_iqr()_Z
-525 f_body_gyro_Jerk_entropy()_X
-526 f_body_gyro_Jerk_entropy()_Y
-527 f_body_gyro_Jerk_entropy()_Z
-528 f_body_gyro_Jerk_maxInd()_X
-529 f_body_gyro_Jerk_maxInd()_Y
-530 f_body_gyro_Jerk_maxInd()_Z
-531 f_body_gyro_Jerk_meanFreq()_X
-532 f_body_gyro_Jerk_meanFreq()_Y
-533 f_body_gyro_Jerk_meanFreq()_Z
-534 f_body_gyro_Jerk_skewness()_X
-535 f_body_gyro_Jerk_kurtosis()_X
-536 f_body_gyro_Jerk_skewness()_Y
-537 f_body_gyro_Jerk_kurtosis()_Y
-538 f_body_gyro_Jerk_skewness()_Z
-539 f_body_gyro_Jerk_kurtosis()_Z
-540 f_body_gyro_Jerk_BE[1-8]_X
-541 f_body_gyro_Jerk_BE[9-16]_X
-542 f_body_gyro_Jerk_BE[17-24]_X
-543 f_body_gyro_Jerk_BE[25-32]_X
-544 f_body_gyro_Jerk_BE[33-40]_X
-545 f_body_gyro_Jerk_BE[41-48]_X
-546 f_body_gyro_Jerk_BE[49-56]_X
-547 f_body_gyro_Jerk_BE[57-64]_X
-548 f_body_gyro_Jerk_BE[1-16]_X
-549 f_body_gyro_Jerk_BE[17-32]_X
-550 f_body_gyro_Jerk_BE[33-48]_X
-551 f_body_gyro_Jerk_BE[49-64]_X
-552 f_body_gyro_Jerk_BE[1-24]_X
-553 f_body_gyro_Jerk_BE[25-48]_X
-554 f_body_gyro_Jerk_BE[1-8]_Y
-555 f_body_gyro_Jerk_BE[9-16]_Y
-556 f_body_gyro_Jerk_BE[17-24]_Y
-557 f_body_gyro_Jerk_BE[25-32]_Y
-558 f_body_gyro_Jerk_BE[33-40]_Y
-559 f_body_gyro_Jerk_BE[41-48]_Y
-560 f_body_gyro_Jerk_BE[49-56]_Y
-561 f_body_gyro_Jerk_BE[57-64]_Y
-562 f_body_gyro_Jerk_BE[1-16]_Y
-563 f_body_gyro_Jerk_BE[17-32]_Y
-564 f_body_gyro_Jerk_BE[33-48]_Y
-565 f_body_gyro_Jerk_BE[49-64]_Y
-566 f_body_gyro_Jerk_BE[1-24]_Y
-567 f_body_gyro_Jerk_BE[25-48]_Y
-568 f_body_gyro_Jerk_BE[1-8]_Z
-569 f_body_gyro_Jerk_BE[9-16]_Z
-570 f_body_gyro_Jerk_BE[17-24]_Z
-571 f_body_gyro_Jerk_BE[25-32]_Z
-572 f_body_gyro_Jerk_BE[33-40]_Z
-573 f_body_gyro_Jerk_BE[41-48]_Z
-574 f_body_gyro_Jerk_BE[49-56]_Z
-575 f_body_gyro_Jerk_BE[57-64]_Z
-576 f_body_gyro_Jerk_BE[1-16]_Z
-577 f_body_gyro_Jerk_BE[17-32]_Z
-578 f_body_gyro_Jerk_BE[33-48]_Z
-579 f_body_gyro_Jerk_BE[49-64]_Z
-580 f_body_gyro_Jerk_BE[1-24]_Z
-581 f_body_gyro_Jerk_BE[25-48]_Z
+
+    424 f_body_gyro_mean()_X
+    425 f_body_gyro_mean()_Y
+    426 f_body_gyro_mean()_Z
+    427 f_body_gyro_std()_X
+    428 f_body_gyro_std()_Y
+    429 f_body_gyro_std()_Z
+    430 f_body_gyro_mad()_X
+    431 f_body_gyro_mad()_Y
+    432 f_body_gyro_mad()_Z
+    433 f_body_gyro_max()_X
+    434 f_body_gyro_max()_Y
+    435 f_body_gyro_max()_Z
+    436 f_body_gyro_min()_X
+    437 f_body_gyro_min()_Y
+    438 f_body_gyro_min()_Z
+    439 f_body_gyro_sma()
+    440 f_body_gyro_energy()_X
+    441 f_body_gyro_energy()_Y
+    442 f_body_gyro_energy()_Z
+    443 f_body_gyro_iqr()_X
+    444 f_body_gyro_iqr()_Y
+    445 f_body_gyro_iqr()_Z
+    446 f_body_gyro_entropy()_X
+    447 f_body_gyro_entropy()_Y
+    448 f_body_gyro_entropy()_Z
+    449 f_body_gyro_maxInd()_X
+    450 f_body_gyro_maxInd()_Y
+    451 f_body_gyro_maxInd()_Z
+    452 f_body_gyro_meanFreq()_X
+    453 f_body_gyro_meanFreq()_Y
+    454 f_body_gyro_meanFreq()_Z
+    455 f_body_gyro_skewness()_X
+    456 f_body_gyro_kurtosis()_X
+    457 f_body_gyro_skewness()_Y
+    458 f_body_gyro_kurtosis()_Y
+    459 f_body_gyro_skewness()_Z
+    460 f_body_gyro_kurtosis()_Z
+    461 f_body_gyro_BE[1-8]_X
+    462 f_body_gyro_BE[9-16]_X
+    463 f_body_gyro_BE[17-24]_X
+    464 f_body_gyro_BE[25-32]_X
+    465 f_body_gyro_BE[33-40]_X
+    466 f_body_gyro_BE[41-48]_X
+    467 f_body_gyro_BE[49-56]_X
+    468 f_body_gyro_BE[57-64]_X
+    469 f_body_gyro_BE[1-16]_X
+    470 f_body_gyro_BE[17-32]_X
+    471 f_body_gyro_BE[33-48]_X
+    472 f_body_gyro_BE[49-64]_X
+    473 f_body_gyro_BE[1-24]_X
+    474 f_body_gyro_BE[25-48]_X
+    475 f_body_gyro_BE[1-8]_Y
+    476 f_body_gyro_BE[9-16]_Y
+    477 f_body_gyro_BE[17-24]_Y
+    478 f_body_gyro_BE[25-32]_Y
+    479 f_body_gyro_BE[33-40]_Y
+    480 f_body_gyro_BE[41-48]_Y
+    481 f_body_gyro_BE[49-56]_Y
+    482 f_body_gyro_BE[57-64]_Y
+    483 f_body_gyro_BE[1-16]_Y
+    484 f_body_gyro_BE[17-32]_Y
+    485 f_body_gyro_BE[33-48]_Y
+    486 f_body_gyro_BE[49-64]_Y
+    487 f_body_gyro_BE[1-24]_Y
+    488 f_body_gyro_BE[25-48]_Y
+    489 f_body_gyro_BE[1-8]_Z
+    490 f_body_gyro_BE[9-16]_Z
+    491 f_body_gyro_BE[17-24]_Z
+    492 f_body_gyro_BE[25-32]_Z
+    493 f_body_gyro_BE[33-40]_Z
+    494 f_body_gyro_BE[41-48]_Z
+    495 f_body_gyro_BE[49-56]_Z
+    496 f_body_gyro_BE[57-64]_Z
+    497 f_body_gyro_BE[1-16]_Z
+    498 f_body_gyro_BE[17-32]_Z
+    499 f_body_gyro_BE[33-48]_Z
+    500 f_body_gyro_BE[49-64]_Z
+    501 f_body_gyro_BE[1-24]_Z
+    502 f_body_gyro_BE[25-48]_Z
+    503 f_body_gyro_Jerk_mean()_X
+    504 f_body_gyro_Jerk_mean()_Y
+    505 f_body_gyro_Jerk_mean()_Z
+    506 f_body_gyro_Jerk_std()_X
+    507 f_body_gyro_Jerk_std()_Y
+    508 f_body_gyro_Jerk_std()_Z
+    509 f_body_gyro_Jerk_mad()_X
+    510 f_body_gyro_Jerk_mad()_Y
+    511 f_body_gyro_Jerk_mad()_Z
+    512 f_body_gyro_Jerk_max()_X
+    513 f_body_gyro_Jerk_max()_Y
+    514 f_body_gyro_Jerk_max()_Z
+    515 f_body_gyro_Jerk_min()_X
+    516 f_body_gyro_Jerk_min()_Y
+    517 f_body_gyro_Jerk_min()_Z
+    518 f_body_gyro_Jerk_sma()
+    519 f_body_gyro_Jerk_energy()_X
+    520 f_body_gyro_Jerk_energy()_Y
+    521 f_body_gyro_Jerk_energy()_Z
+    522 f_body_gyro_Jerk_iqr()_X
+    523 f_body_gyro_Jerk_iqr()_Y
+    524 f_body_gyro_Jerk_iqr()_Z
+    525 f_body_gyro_Jerk_entropy()_X
+    526 f_body_gyro_Jerk_entropy()_Y
+    527 f_body_gyro_Jerk_entropy()_Z
+    528 f_body_gyro_Jerk_maxInd()_X
+    529 f_body_gyro_Jerk_maxInd()_Y
+    530 f_body_gyro_Jerk_maxInd()_Z
+    531 f_body_gyro_Jerk_meanFreq()_X
+    532 f_body_gyro_Jerk_meanFreq()_Y
+    533 f_body_gyro_Jerk_meanFreq()_Z
+    534 f_body_gyro_Jerk_skewness()_X
+    535 f_body_gyro_Jerk_kurtosis()_X
+    536 f_body_gyro_Jerk_skewness()_Y
+    537 f_body_gyro_Jerk_kurtosis()_Y
+    538 f_body_gyro_Jerk_skewness()_Z
+    539 f_body_gyro_Jerk_kurtosis()_Z
+    540 f_body_gyro_Jerk_BE[1-8]_X
+    541 f_body_gyro_Jerk_BE[9-16]_X
+    542 f_body_gyro_Jerk_BE[17-24]_X
+    543 f_body_gyro_Jerk_BE[25-32]_X
+    544 f_body_gyro_Jerk_BE[33-40]_X
+    545 f_body_gyro_Jerk_BE[41-48]_X
+    546 f_body_gyro_Jerk_BE[49-56]_X
+    547 f_body_gyro_Jerk_BE[57-64]_X
+    548 f_body_gyro_Jerk_BE[1-16]_X
+    549 f_body_gyro_Jerk_BE[17-32]_X
+    550 f_body_gyro_Jerk_BE[33-48]_X
+    551 f_body_gyro_Jerk_BE[49-64]_X
+    552 f_body_gyro_Jerk_BE[1-24]_X
+    553 f_body_gyro_Jerk_BE[25-48]_X
+    554 f_body_gyro_Jerk_BE[1-8]_Y
+    555 f_body_gyro_Jerk_BE[9-16]_Y
+    556 f_body_gyro_Jerk_BE[17-24]_Y
+    557 f_body_gyro_Jerk_BE[25-32]_Y
+    558 f_body_gyro_Jerk_BE[33-40]_Y
+    559 f_body_gyro_Jerk_BE[41-48]_Y
+    560 f_body_gyro_Jerk_BE[49-56]_Y
+    561 f_body_gyro_Jerk_BE[57-64]_Y
+    562 f_body_gyro_Jerk_BE[1-16]_Y
+    563 f_body_gyro_Jerk_BE[17-32]_Y
+    564 f_body_gyro_Jerk_BE[33-48]_Y
+    565 f_body_gyro_Jerk_BE[49-64]_Y
+    566 f_body_gyro_Jerk_BE[1-24]_Y
+    567 f_body_gyro_Jerk_BE[25-48]_Y
+    568 f_body_gyro_Jerk_BE[1-8]_Z
+    569 f_body_gyro_Jerk_BE[9-16]_Z
+    570 f_body_gyro_Jerk_BE[17-24]_Z
+    571 f_body_gyro_Jerk_BE[25-32]_Z
+    572 f_body_gyro_Jerk_BE[33-40]_Z
+    573 f_body_gyro_Jerk_BE[41-48]_Z
+    574 f_body_gyro_Jerk_BE[49-56]_Z
+    575 f_body_gyro_Jerk_BE[57-64]_Z
+    576 f_body_gyro_Jerk_BE[1-16]_Z
+    577 f_body_gyro_Jerk_BE[17-32]_Z
+    578 f_body_gyro_Jerk_BE[33-48]_Z
+    579 f_body_gyro_Jerk_BE[49-64]_Z
+    580 f_body_gyro_Jerk_BE[1-24]_Z
+    581 f_body_gyro_Jerk_BE[25-48]_Z
+
 582 f_body_acc_Mag_mean()
 583 f_body_acc_Mag_std()
 584 f_body_acc_Mag_mad()
@@ -631,6 +643,7 @@
 631 f_body_gyro_Jerk_Mag_meanFreq()
 632 f_body_gyro_Jerk_Mag_skewness()
 633 f_body_gyro_Jerk_Mag_kurtosis()
+
 634 angle0()
 635 angle1()
 636 angle2()

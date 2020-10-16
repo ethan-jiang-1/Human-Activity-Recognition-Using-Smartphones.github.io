@@ -74,6 +74,7 @@ display(f_signal.imag)
  3.88788180e-02 + 1.30292248e-01j  1.60379980e-01 + 4.31795526e-01j
  - 7.25598680e-02 + 1.53309633e-02j  7.59437773e-02 - 8.05002104e-02j
  - 5.49634326e-01 + 2.02289242e-01j - 1.91192653e-01 - 2.20933893e-01j
+ 
  5.22222133e-01 - 0.00000000e+00j - 1.91192653e-01 + 2.20933893e-01j
  - 5.49634326e-01 - 2.02289242e-01j  7.59437773e-02 + 8.05002104e-02j
  - 7.25598680e-02 - 1.53309633e-02j  1.60379980e-01 - 4.31795526e-01j
@@ -108,6 +109,14 @@ display(f_signal.imag)
  1.43708598e+00 - 3.39695614e+00j  7.92717839e-01 + 4.72473830e-01j]
 '''
 
-t_signal_new = ifft(f_signal).real
-print("t_signal_new real")
-display(t_signal_new)
+f_signal128 = f_signal
+t_signal_new128 = ifft(f_signal).real
+print("t_signal_new128 real")
+display(t_signal_new128)
+
+# f_signal64 =  np.array(f_signal128)
+# for i in range(64,128):
+#     f_signal64[i] = 0
+# t_signal_new64 = ifft(f_signal64).real
+# print("t_singal_new64 reak")
+# display(t_signal_new64)

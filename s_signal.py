@@ -50,6 +50,9 @@ def components_selection_one_signal(t_signal, freq1=freq1, freq2=freq2):
     # frequency values between [-25hz:+25hz]
     d = 1 / float(sampling_freq)
     freqs = np.array(fftfreq(t_signal_length, d=d))
+    
+    from IPython.display import display
+    display(freqs)
 
     # DC_component: f_signal values having freq between [-0.3 hz to 0 hz] and from [0 hz to 0.3hz]
     #                                                             (-0.3 and 0.3 are included)

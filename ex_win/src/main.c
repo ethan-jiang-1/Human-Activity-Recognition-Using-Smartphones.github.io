@@ -5,6 +5,7 @@
 #include <math.h>
 #include "fft.h"
 #include "kmem.h"
+#include "freq_tbl.h"
 
 #define NFFT 128
 
@@ -33,7 +34,7 @@ float t_signal[] = {0.87083336, 0.84583341, 0.85138888, 0.85694444, 0.80833337, 
 
 void exec_fft_real()
 {
-	
+	printf("\n#### exec_fft_real\n");
 	fft_config_t *real_fft_plan = fft_init(NFFT, FFT_REAL, FFT_FORWARD, NULL, NULL);
 	//fft_config_t *real_fft_plan = fft_init(NFFT, FFT_COMPLEX, FFT_FORWARD, NULL, NULL);
 	//memset(real_fft_plan->input, 0, NFFT * sizeof(float));
@@ -52,10 +53,6 @@ void exec_fft_real()
 		if (k % 2 == 0)
 			printf("\n");
 		printf("%e, %ej  ", re, im);
-		// LOGD("re: %f, im: %f", re, im);
-		//float mag = sqrt(re * re + im * im);
-		// LOGD("k: %d, mag: %f, sum: %f\n", k, mag, sum);
-		//sum += mag;
 	}
 	printf("\n");
 	fft_destroy(real_fft_plan);
@@ -99,6 +96,7 @@ void exec_fft_real()
 
 void exec_fft_complex()
 {
+	printf("\n#### exec_fft_complex\n");
 	fft_config_t *complex_fft_plan = fft_init(NFFT, FFT_COMPLEX, FFT_FORWARD, NULL, NULL);
 	//memset(complex_fft_plan->input, 0, NFFT * sizeof(float));
 	for (int i = 0; i < NFFT; i++)
@@ -117,10 +115,6 @@ void exec_fft_complex()
 		if (k % 2 == 0)
 			printf("\n");
 		printf("%e, %ej  ", re, im);
-		// LOGD("re: %f, im: %f", re, im);
-		//float mag = sqrt(re * re + im * im);
-		// LOGD("k: %d, mag: %f, sum: %f\n", k, mag, sum);
-		//sum += mag;
 	}
 	printf("\n");
 	fft_destroy(complex_fft_plan);
@@ -195,6 +189,10 @@ void exec_fft_complex()
 
 */
 
+void exec_split_singal()
+{
+	printf("\n#### exec_split_singal\n");
+}
 
 int main(int argc, const char *argv[])
 {
@@ -202,22 +200,8 @@ int main(int argc, const char *argv[])
 
 	exec_fft_real();
 	exec_fft_complex();
-	// /* Features: */
-	// float features[argc - 1];
-	// int i;
-	// for (i = 1; i < argc; i++)
-	// {
-	//     features[i - 1] = atof(argv[i]);
-	// }
 
-	// /* Prediction: */
-	// printf("%d", predict(features));
+	exec_split_singal();
+
 	return 1;
-}
-
-int xxmain()
-{
-	printf("Hello World!\n");
-
-	return (0);
 }
